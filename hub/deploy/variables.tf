@@ -13,6 +13,14 @@ variable "hub_instance_type" {
 variable "hub_ami_id" {
   type = string
 }
+
+variable "hub_amis_id" {
+  type = map
+  default = {
+    eu-west-2 = "ami-013984d976f6d6894"
+    eu-west-1 = "ami-065ec1e661d619058"
+  }
+}
   
 
 variable "aws_access_key" {

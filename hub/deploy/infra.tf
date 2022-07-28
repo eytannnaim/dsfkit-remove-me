@@ -8,7 +8,7 @@
 # }
 
 resource "aws_instance" "web" {
-  ami           = var.hub_ami_id
+  ami           = var.hub_amis_id[var.aws_region]
   instance_type = var.hub_instance_type
 
   tags = {
