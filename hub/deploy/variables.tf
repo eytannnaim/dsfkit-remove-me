@@ -31,3 +31,8 @@ variable "aws_access_key" {
 variable "aws_secret_key" {
     type = string
 }
+
+
+variable "hub_vpc_cidr" {
+  type = string
+}

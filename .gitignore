@@ -1,1 +1,3 @@
 hub/deploy/.terraform/*
+key
+key.pub

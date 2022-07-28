@@ -1,43 +1,46 @@
-resource "aws_instance" "web" {
-  ami           = var.hub_amis_id[var.aws_region]
-  instance_type = var.hub_instance_type
-  key_name = aws_key_pair.deployer.key_name
-  # security_groups = [ "test-public-sg" ]
-  
-subnet_id = aws_subnet.public_subnet.id
-  tags = {
-    Name = "HelloWorld"
-  }
-}
-
-
 resource "aws_vpc" "hub_vpc" {
-  cidr_block = "10.0.0.0/16"
+  cidr_block =  var.hub_vpc_cidr
   
 }
 
 resource "aws_subnet" "public_subnet" {
   vpc_id     = aws_vpc.hub_vpc.id
-  cidr_block = "10.0.1.0/24"
+  cidr_block = var.hub_public_subnet_cidr
 
   tags = {
-    Name = "Hub"
+    Name = "sonar-hub-public-subnet"
   }
 }
 
+resource "aws_instance" "sonar_hub_instance" {
+  ami           = var.hub_amis_id[var.aws_region]
+  instance_type = var.hub_instance_type
+  key_name = aws_key_pair.deployer.key_name
+  
+subnet_id = aws_subnet.public_subnet.id
+  tags = {
+    Name = "sonar-hub"
+  }
+}
+
+ resource "aws_eip" "sonar_hub_eip" {
+  instance = aws_instance.web.id
+  vpc      = true
+}
+
 resource "aws_key_pair" "deployer" {
-  key_name   = "deployer-key"
+  key_name   = "hub-key-pair"
   public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCuEr/yHjzIXunGOPrLkLFjZ6Cns/8nOoGQApMAJp1sk6ZUq85TmTeaMM38nI037azJoytp6M4S3qRMZuw6VJlGmIY+23Mg7vkJlVBK0bc0CYZuiRm4g3XiNUxihyxDFSdbaDctuq25U8uRj04aG/pwAVWOG+ZN0b2bUqMDDtZKx19pjCY7TY/BRCwV88MTekFeqThfJiIS9HFikbjF85pjTTSPq/cWVjeb38PDmCxpfEZMRPjJxcay6MD8JcIH0yprnG11Kw5UFenQGP4VCrvO3zA+IpH3YPIqNpbXIND8cMT/90iFTiMuUULZ7AJAZ62sg4+iZmPniK0wZQZasXTttaV/GNj/nlo0PIkl+D1g5YocsICpsImG5s7WPruz02ICcWjSOSFpye/Uvj7E3XpHnj/gXGCM7Y69A/3x0GxqBvPsM3G62odnlZMHnfVk+3f1e6UjGV/k6EU3YvuQZyjif0xxQNOaYMorApIhmlgXnKFQOCDxHHHh3xFiYNX2iHM= gabi.beyo@MBP-175553.local"
 }
 
 
 resource "aws_security_group" "public" {
-  name = "test-public-sg"
+  name = "sonar-hub-public-sg"
   description = "Public internet access"
   vpc_id = aws_vpc.hub_vpc.id
  
   tags = {
-    Name        = "test-public-sg"
+    Name  = "sonar-hub-public-sg"
   }
 }
  
@@ -78,40 +81,31 @@ resource "aws_security_group_rule" "public_in_https" {
   security_group_id = aws_security_group.public.id
 }
  
- resource "aws_eip" "lb" {
-  instance = aws_instance.web.id
-  vpc      = true
-}
 
 
 resource "aws_internet_gateway" "gw" {
   vpc_id = aws_vpc.hub_vpc.id
 
   tags = {
-    Name = "main"
+    Name = "sonar-hub-public-gw"
   }
 }
-
 
 resource "aws_network_interface_sg_attachment" "sg_attachment" {
   security_group_id    = aws_security_group.public.id
   network_interface_id = aws_instance.web.primary_network_interface_id
 }
 
-resource "aws_route_table" "example" {
+resource "aws_route_table" "sonar-hub-public-rt" {
   vpc_id = aws_vpc.hub_vpc.id
 
   route {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.gw.id
   }
-
-
-
-  tags = {
-    Name = "example"
-  }
 }
 
-
-
+resource "aws_route_table_association" "public_subnet_route_table_association" {
+  subnet_id      = aws_subnet.public_subnet.id
+  route_table_id = aws_route_table.example.id
+}
