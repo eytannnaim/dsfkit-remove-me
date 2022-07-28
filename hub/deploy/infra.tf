@@ -24,7 +24,7 @@ subnet_id = aws_subnet.public_subnet.id
 }
 
  resource "aws_eip" "sonar_hub_eip" {
-  instance = aws_instance.web.id
+  instance = aws_instance.sonar_hub_instance.id
   vpc      = true
 }
 
@@ -93,7 +93,7 @@ resource "aws_internet_gateway" "gw" {
 
 resource "aws_network_interface_sg_attachment" "sg_attachment" {
   security_group_id    = aws_security_group.public.id
-  network_interface_id = aws_instance.web.primary_network_interface_id
+  network_interface_id = aws_instance.sonar_hub_instance.primary_network_interface_id
 }
 
 resource "aws_route_table" "sonar-hub-public-rt" {
@@ -107,5 +107,5 @@ resource "aws_route_table" "sonar-hub-public-rt" {
 
 resource "aws_route_table_association" "public_subnet_route_table_association" {
   subnet_id      = aws_subnet.public_subnet.id
-  route_table_id = aws_route_table.example.id
+  route_table_id = aws_route_table.sonar-hub-public-rt.id
 }

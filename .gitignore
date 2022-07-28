@@ -1,3 +1,6 @@
-hub/deploy/.terraform/*
 key
 key.pub
+*/.terraform/*
+*terraform.tfstate
+*terraform.tfstate.backup
+

@@ -36,3 +36,7 @@ variable "aws_secret_key" {
 variable "hub_vpc_cidr" {
   type = string
 }
+
+variable "hub_public_subnet_cidr" {
+  type = string
+}
