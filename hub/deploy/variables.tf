@@ -1,7 +1,7 @@
 variable "aws_region" {
-  type = "string"
+  type = string
 }
 
 variable "sonar_version" {
-  type = "string"
+  type = string
 }
