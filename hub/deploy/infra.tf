@@ -8,7 +8,7 @@
 # }
 
 resource "aws_instance" "web" {
-  ami           = "ami-013984d976f6d6894"
+  ami           = var.hub_ami_id
   instance_type = var.hub_instance_type
 
   tags = {
