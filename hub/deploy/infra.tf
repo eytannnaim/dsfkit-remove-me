@@ -12,6 +12,15 @@ resource "aws_subnet" "public_subnet" {
   }
 }
 
+resource "aws_subnet" "private_subnet" {
+  vpc_id     = aws_vpc.hub_vpc.id
+  cidr_block = var.hub_private_subnet_cidr
+
+  tags = {
+    Name = "sonar-hub-private-subnet"
+  }
+}
+
 resource "aws_instance" "sonar_hub_instance" {
   ami           = var.hub_amis_id[var.aws_region]
   instance_type = var.hub_instance_type
