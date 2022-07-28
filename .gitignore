@@ -1,1 +1,5 @@
-hub/deploy/.terraform/*
+*/.terraform/*
+*.terraform.lock.hcl
+*terraform.tfvars
+*terraform.tfstate
+*terraform.tfstate.backup
