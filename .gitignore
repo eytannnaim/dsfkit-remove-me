@@ -3,4 +3,5 @@ key.pub
 **/.terraform/*
 *terraform.tfstate
 *terraform.tfstate.backup
-
+*.svg
+*terraform.tfvars
