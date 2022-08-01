@@ -1,6 +1,6 @@
 resource "aws_vpc" "hub_vpc" {
-  cidr_block =  var.hub_vpc_cidr
-  
+  cidr_block = var.hub_vpc_cidr
+
 }
 
 resource "aws_subnet" "public_subnet" {
@@ -24,15 +24,15 @@ resource "aws_subnet" "private_subnet" {
 resource "aws_instance" "sonar_hub_instance" {
   ami           = var.hub_amis_id[var.aws_region]
   instance_type = var.hub_instance_type
-  key_name = aws_key_pair.deployer.key_name
-  
-subnet_id = aws_subnet.public_subnet.id
+  key_name      = aws_key_pair.deployer.key_name
+
+  subnet_id = aws_subnet.public_subnet.id
   tags = {
     Name = "sonar-hub"
   }
 }
 
- resource "aws_eip" "sonar_hub_eip" {
+resource "aws_eip" "sonar_hub_eip" {
   instance = aws_instance.sonar_hub_instance.id
   vpc      = true
 }
@@ -44,25 +44,25 @@ resource "aws_key_pair" "deployer" {
 
 
 resource "aws_security_group" "public" {
-  name = "sonar-hub-public-sg"
+  name        = "sonar-hub-public-sg"
   description = "Public internet access"
-  vpc_id = aws_vpc.hub_vpc.id
- 
+  vpc_id      = aws_vpc.hub_vpc.id
+
   tags = {
-    Name  = "sonar-hub-public-sg"
+    Name = "sonar-hub-public-sg"
   }
 }
- 
+
 resource "aws_security_group_rule" "public_out" {
   type        = "egress"
   from_port   = 0
   to_port     = 0
   protocol    = "-1"
   cidr_blocks = ["0.0.0.0/0"]
- 
+
   security_group_id = aws_security_group.public.id
 }
- 
+
 resource "aws_security_group_rule" "public_in_ssh" {
   type              = "ingress"
   from_port         = 22
@@ -71,7 +71,7 @@ resource "aws_security_group_rule" "public_in_ssh" {
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.public.id
 }
- 
+
 resource "aws_security_group_rule" "public_in_http" {
   type              = "ingress"
   from_port         = 80
@@ -80,7 +80,7 @@ resource "aws_security_group_rule" "public_in_http" {
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.public.id
 }
- 
+
 resource "aws_security_group_rule" "public_in_https" {
   type              = "ingress"
   from_port         = 443
@@ -89,7 +89,7 @@ resource "aws_security_group_rule" "public_in_https" {
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.public.id
 }
- 
+
 
 
 resource "aws_internet_gateway" "gw" {

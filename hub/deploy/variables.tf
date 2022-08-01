@@ -15,21 +15,21 @@ variable "hub_ami_id" {
 }
 
 variable "hub_amis_id" {
-  type = map
+  type = map(any)
   default = {
     eu-west-2 = "ami-013984d976f6d6894"
     eu-west-1 = "ami-065ec1e661d619058"
   }
 }
-  
+
 
 variable "aws_access_key" {
-    type = string
-    
+  type = string
+
 }
 
 variable "aws_secret_key" {
-    type = string
+  type = string
 }
 
 
