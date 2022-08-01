@@ -2,7 +2,23 @@ variable "aws_region" {
   type = string
 }
 
-variable "sonar_version" {
+variable "aws_access_key" {
+  type = string
+}
+
+variable "aws_secret_key" {
+  type = string
+}
+
+variable "hub_vpc_cidr" {
+  type = string
+}
+
+variable "hub_public_subnet_cidr" {
+  type = string
+}
+
+variable "hub_private_subnet_cidr" {
   type = string
 }
 
@@ -10,10 +26,40 @@ variable "hub_instance_type" {
   type = string
 }
 
-variable "hub_ami_id" {
+variable "hub_machine_name" {
+  default = "imperva-dsf-hub"
+}
+
+resource "random_password" "password" {
+  length           = 16
+  special          = true
+  override_special = "!#$%&*()-_=+[]{}<>:?"
+}
+
+data "http" "workstartion_public_ip" {
+  url = "http://ifconfig.me"
+}
+
+variable "security_group_ingress" { default = ["80.179.69.240/28"] }
+
+variable "hub_disk_size" {
+  default = 500
+}
+
+variable "hub_disk_type" {
+  default = "gp3"
+}
+
+variable "hub_public_ip" {
+  default = true
+}
+
+variable "hub_key_pair" {
   type = string
 }
 
+# This list was created with the following command
+# > for r in $(awsregions) ; do echo $r = $(aws --region $r ec2 describe-images  --filters Name=name,Values=RHEL-7.9_HVM-202205* | jq '.Images[0]."ImageId" '); done
 variable "hub_amis_id" {
   type = map(any)
   default = {
@@ -39,27 +85,4 @@ variable "hub_amis_id" {
     us-west-1 = "ami-085733fd69e77a079"
     us-west-2 = "ami-027da4fca766221c9"
   }
-}
-
-
-variable "aws_access_key" {
-  type = string
-
-}
-
-variable "aws_secret_key" {
-  type = string
-}
-
-
-variable "hub_vpc_cidr" {
-  type = string
-}
-
-variable "hub_public_subnet_cidr" {
-  type = string
-}
-
-variable "hub_private_subnet_cidr" {
-  type = string
 }
