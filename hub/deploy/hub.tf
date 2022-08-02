@@ -116,3 +116,4 @@ data "aws_iam_role" "s3_full_read_access_profile" {
 # take password from vars
 # Add additional logical volume for DSF hub files - this is an instance depended solution and therefore should be handled in the future
 # make userdata run always to fix overcome issues that might be affected by a reboot or a disk change or a instance change - https://aws.amazon.com/premiumsupport/knowledge-center/execute-user-data-ec2/
+# add condition variable and wait until installation complete
