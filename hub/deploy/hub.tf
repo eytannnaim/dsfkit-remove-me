@@ -15,9 +15,27 @@ resource "aws_eip" "sonar_hub_eip" {
 
 resource "aws_key_pair" "deployer" {
   key_name   = "hub-key-pair"
-  public_key =  file("key.pub")
+  public_key =  data.local_file.hub_key.content
+
+  # provisioner "local-exec" {
+  #   command = "ssh-keygen -t rsa -f 'hub_key' -P '' && cat hub_key.pub"
+  # }
+  # depends_on = [
+  #   null_resource.example1
+  # ]
 }
 
+resource "null_resource" "example1" {
+  provisioner "local-exec" {
+    command = "[ -f 'hub_key' ] || ssh-keygen -t rsa -f 'hub_key' -P ''"
+    interpreter = ["/bin/bash", "-c"]
+  }
+}
+
+data "local_file" "hub_key" {
+  filename = "hub_key.pub"
+  depends_on = [null_resource.example1]
+}
 
 # resource "aws_eip" "dsf_hub_eip" {
 #   instance = aws_instance.dsf_hub_instance.id
@@ -53,7 +71,13 @@ resource "aws_instance" "sonar_hub_instance" {
   tags = {
     Name = var.hub_machine_name
   }
+
+  # provisioner "local-exec" {
+  #  command = "ssh-keygen -t rsa -f 'hub_key' -P '' && cat hub_key.pub"
+  # }
 }
+
+
 
 # Remove this
 data "aws_iam_role" "s3_full_read_access_profile" {
