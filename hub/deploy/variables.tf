@@ -43,7 +43,7 @@ data "http" "workstartion_public_ip" {
 variable "vpn_security_group_ingress" { default = ["80.179.69.240/28"] }
 
 variable "hub_disk_size" {
-  default = 500
+  default = 60
 }
 
 variable "hub_disk_type" {
