@@ -44,18 +44,35 @@ resource "aws_instance" "sonar_hub_instance" {
   subnet_id = aws_subnet.public_subnet.id
   # associate_public_ip_address = var.hub_public_ip
   user_data                   = data.template_cloudinit_config.sonar_config.rendered
-  iam_instance_profile = data.aws_iam_role.s3_full_read_access_profile.id
+  iam_instance_profile = aws_iam_instance_profile.test_profile.id
   # vpc_security_group_ids      = [aws_security_group.public.id]
   tags = {
     Name = var.hub_machine_name
   }
+
 }
 
-
-data "aws_iam_role" "s3_full_read_access_profile" {
-  name = "s3-full-read-access"
+resource "aws_iam_instance_profile" "test_profile" {
+  name = "hub_test_profile"
+  role = "${aws_iam_role.dsf_hub_role.name}"
 }
 
+resource "aws_iam_role" "dsf_hub_role" {
+  managed_policy_arns = ["arn:aws:iam::aws:policy/SecretsManagerReadWrite"]
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Sid    = ""
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      },
+    ]
+  })
+}
 # resource "aws_instance" "sonar_hub_instance" {
 #   ami           = var.hub_amis_id[var.aws_region]
 #   instance_type = var.hub_instance_type
