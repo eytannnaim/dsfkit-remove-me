@@ -40,7 +40,7 @@ data "http" "workstartion_public_ip" {
   url = "http://ifconfig.me"
 }
 
-variable "security_group_ingress" { default = ["80.179.69.240/28"] }
+variable "vpn_security_group_ingress" { default = ["80.179.69.240/28"] }
 
 variable "hub_disk_size" {
   default = 500
@@ -50,13 +50,13 @@ variable "hub_disk_type" {
   default = "gp3"
 }
 
-variable "hub_public_ip" {
-  default = true
-}
+# variable "hub_public_ip" {
+#   default = true
+# }
 
-variable "hub_key_pair" {
-  type = string
-}
+# variable "hub_key_pair" {
+#   type = string
+# }
 
 # This list was created with the following command
 # > for r in $(awsregions) ; do echo $r = $(aws --region $r ec2 describe-images  --filters Name=name,Values=RHEL-7.9_HVM-202205* | jq '.Images[0]."ImageId" '); done
