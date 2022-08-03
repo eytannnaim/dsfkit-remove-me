@@ -49,15 +49,9 @@ resource "aws_instance" "sonar_hub_instance" {
   # associate_public_ip_address = var.hub_public_ip
   user_data                   = data.template_cloudinit_config.sonar_config.rendered
   # vpc_security_group_ids      = [aws_security_group.public.id]
-  iam_instance_profile        = data.aws_iam_role.s3_full_read_access_profile.id
   tags = {
     Name = var.hub_machine_name
   }
-}
-
-# Remove this
-data "aws_iam_role" "s3_full_read_access_profile" {
-  name = "s3-full-read-access"
 }
 
 # consider removing this
