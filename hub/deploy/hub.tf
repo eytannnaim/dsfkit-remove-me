@@ -35,42 +35,7 @@ data "template_cloudinit_config" "sonar_config" {
         #!/bin/bash
         cd /root
         yum update -y
-        yum install unzip -y
-        
-        # Preperations for install
-        DIR=/opt/sonar-dsf
-        useradd sonargd
-        useradd sonarg
-        useradd sonarw
-        groupadd sonar
-        usermod -g sonar sonarw
-        usermod -g sonar sonargd
-        mkdir -p $DIR
-
-        # Creating logical volume for DSF hub files - this is instance depended and therefore should be handled in the future
-        #yum install lvm2 -y
-        #pvcreate -ff /dev/nvme1n1 -y
-        #vgcreate data /dev/nvme1n1 
-        #lvcreate -n vol0 -l 100%FREE data -y
-        #mkfs.xfs /dev/mapper/data-vol0
-        #echo "$(blkid /dev/mapper/data-vol0 | cut -d ':' -f2 | awk '{print $1}') /opt xfs defaults 0 0" | sudo tee -a /etc/fstab
-        #sudo mount -a
-        
-        # Install awscli
-        curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-        unzip awscliv2.zip
-        aws/install
-        rm -rf aws awscliv2.zip
-        
-        # Download installation file
-        aws s3 cp  s3://0ed58e18-0c0c-11ed-861d-0242ac120003/jsonar-4.8.a.tar.gz .
-        
-        # Installation
-        tar -xf  jsonar-4.8.a.tar.gz  -gz -C $DIR
-        rm jsonar-4.8.a.tar.gz
-        chown -R sonarw:sonar $DIR
-        hostname ${var.hub_machine_name}
-        /opt/sonar-dsf/jsonar/apps/4.8.a/bin/sonarg-setup --no-interactive --accept-eula --jsonar-uid-display-name "DSF-Hub" --jsonar-uid $(uuidgen) --not-remote-machine --product sonar-platform --newadmin-pass=my_password --secadmin-pass=my_password --sonarg-pass=my_password --sonargd-pass=my_password
+        /opt/sonar-dsf/jsonar/apps/*/bin/sonarg-setup --no-interactive --accept-eula --jsonar-uid-display-name "DSF-Hub" --jsonar-uid $(uuidgen) --not-remote-machine --product sonar-platform --newadmin-pass=my_password --secadmin-pass=my_password --sonarg-pass=my_password --sonargd-pass=my_password
     END
   }
 }
@@ -87,10 +52,6 @@ resource "aws_instance" "sonar_hub_instance" {
   iam_instance_profile        = data.aws_iam_role.s3_full_read_access_profile.id
   tags = {
     Name = var.hub_machine_name
-  }
-  root_block_device {
-    volume_type = var.hub_disk_type
-    volume_size = var.hub_disk_size
   }
 }
 
@@ -130,12 +91,12 @@ data "aws_iam_role" "s3_full_read_access_profile" {
 
 # gaps:
 # how to copy the installation file
-# add time wait condition that waits until GUI is visible
+# add time wait condition that waits until GUI is visible (6 minutes to gui to became active)
 # remove you role
 # solve pem issue
 # solve the package download issue
 # propate random password to hub
-# take password from vars
 # Add additional logical volume for DSF hub files - this is an instance depended solution and therefore should be handled in the future
 # make userdata run always to fix overcome issues that might be affected by a reboot or a disk change or a instance change - https://aws.amazon.com/premiumsupport/knowledge-center/execute-user-data-ec2/
 # add condition variable and wait until installation complete
+# add some feedback for the hub installation
