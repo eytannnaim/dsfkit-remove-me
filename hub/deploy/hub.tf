@@ -1,13 +1,3 @@
-# resource "aws_instance" "sonar_hub_instance" {
-#   ami           = var.hub_amis_id[var.aws_region]
-#   instance_type = var.hub_instance_type
-#   key_name      = aws_key_pair.deployer.key_name
-#   subnet_id = aws_subnet.public_subnet.id
-#   tags = {
-#     Name = "sonar-hub"
-#   }
-# }
-
 resource "aws_eip" "sonar_hub_eip" {
   instance = aws_instance.sonar_hub_instance.id
   vpc      = true
@@ -16,13 +6,6 @@ resource "aws_eip" "sonar_hub_eip" {
 resource "aws_key_pair" "deployer" {
   key_name   = "hub-key-pair"
   public_key =  data.local_file.hub_key.content
-
-  # provisioner "local-exec" {
-  #   command = "ssh-keygen -t rsa -f 'hub_key' -P '' && cat hub_key.pub"
-  # }
-  # depends_on = [
-  #   null_resource.example1
-  # ]
 }
 
 resource "null_resource" "example1" {
@@ -36,11 +19,6 @@ data "local_file" "hub_key" {
   filename = "hub_key.pub"
   depends_on = [null_resource.example1]
 }
-
-# resource "aws_eip" "dsf_hub_eip" {
-#   instance = aws_instance.dsf_hub_instance.id
-#   vpc = true
-# }
 
 data "template_cloudinit_config" "sonar_config" {
   gzip          = false
@@ -66,23 +44,27 @@ resource "aws_instance" "sonar_hub_instance" {
   subnet_id = aws_subnet.public_subnet.id
   # associate_public_ip_address = var.hub_public_ip
   user_data                   = data.template_cloudinit_config.sonar_config.rendered
+  iam_instance_profile = data.aws_iam_role.s3_full_read_access_profile.id
   # vpc_security_group_ids      = [aws_security_group.public.id]
-  iam_instance_profile        = data.aws_iam_role.s3_full_read_access_profile.id
   tags = {
     Name = var.hub_machine_name
   }
-
-  # provisioner "local-exec" {
-  #  command = "ssh-keygen -t rsa -f 'hub_key' -P '' && cat hub_key.pub"
-  # }
 }
 
 
-
-# Remove this
 data "aws_iam_role" "s3_full_read_access_profile" {
   name = "s3-full-read-access"
 }
+
+# resource "aws_instance" "sonar_hub_instance" {
+#   ami           = var.hub_amis_id[var.aws_region]
+#   instance_type = var.hub_instance_type
+#   key_name      = aws_key_pair.deployer.key_name
+#   subnet_id = aws_subnet.public_subnet.id
+#   tags = {
+#     Name = "sonar-hub"
+#   }
+# }
 
 # consider removing this
 #resource "aws_kms_key" "imperva_hub_kms" {
