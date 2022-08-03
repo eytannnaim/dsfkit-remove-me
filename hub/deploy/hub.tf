@@ -15,16 +15,8 @@ resource "aws_eip" "sonar_hub_eip" {
 
 resource "aws_key_pair" "deployer" {
   key_name   = "hub-key-pair"
-  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCuEr/yHjzIXunGOPrLkLFjZ6Cns/8nOoGQApMAJp1sk6ZUq85TmTeaMM38nI037azJoytp6M4S3qRMZuw6VJlGmIY+23Mg7vkJlVBK0bc0CYZuiRm4g3XiNUxihyxDFSdbaDctuq25U8uRj04aG/pwAVWOG+ZN0b2bUqMDDtZKx19pjCY7TY/BRCwV88MTekFeqThfJiIS9HFikbjF85pjTTSPq/cWVjeb38PDmCxpfEZMRPjJxcay6MD8JcIH0yprnG11Kw5UFenQGP4VCrvO3zA+IpH3YPIqNpbXIND8cMT/90iFTiMuUULZ7AJAZ62sg4+iZmPniK0wZQZasXTttaV/GNj/nlo0PIkl+D1g5YocsICpsImG5s7WPruz02ICcWjSOSFpye/Uvj7E3XpHnj/gXGCM7Y69A/3x0GxqBvPsM3G62odnlZMHnfVk+3f1e6UjGV/k6EU3YvuQZyjif0xxQNOaYMorApIhmlgXnKFQOCDxHHHh3xFiYNX2iHM= gabi.beyo@MBP-175553.local"
+  public_key =  file("key.pub")
 }
-
-
-
-
-
-
-
-
 
 
 # resource "aws_eip" "dsf_hub_eip" {
