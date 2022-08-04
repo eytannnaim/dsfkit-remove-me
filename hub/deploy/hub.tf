@@ -1,26 +1,26 @@
-resource "aws_eip" "sonar_hub_eip" {
-  instance = aws_instance.sonar_hub_instance.id
+resource "aws_eip" "dsf_hub_eip" {
+  instance = aws_instance.dsf_hub_instance.id
   vpc      = true
 }
 
-resource "aws_key_pair" "deployer" {
-  key_name   = "hub-key-pair"
-  public_key =  data.local_file.hub_key.content
+resource "aws_key_pair" "dsf_hub_ssh_keypair_creator" {
+  key_name   = "dsf_hub_ssh_keypair_creator"
+  public_key =  data.local_file.dsf_hub_ssh_key.content
 }
 
-resource "null_resource" "example1" {
+resource "null_resource" "dsf_hub_ssh_key_pair_creator" {
   provisioner "local-exec" {
-    command = "[ -f 'hub_key' ] || ssh-keygen -t rsa -f 'hub_key' -P ''"
+    command = "[ -f 'dsf_hub_ssh_key' ] || ssh-keygen -t rsa -f 'dsf_hub_ssh_key' -P ''"
     interpreter = ["/bin/bash", "-c"]
   }
 }
 
-data "local_file" "hub_key" {
-  filename = "hub_key.pub"
-  depends_on = [null_resource.example1]
+data "local_file" "dsf_hub_ssh_key" {
+  filename = "dsf_hub_ssh_key.pub"
+  depends_on = [null_resource.dsf_hub_ssh_key_pair_creator]
 }
 
-data "template_cloudinit_config" "sonar_config" {
+data "template_cloudinit_config" "dsf_hub_instance_config" {
   gzip          = false
   base64_encode = false
 
@@ -36,15 +36,15 @@ data "template_cloudinit_config" "sonar_config" {
   }
 }
 
-resource "aws_instance" "sonar_hub_instance" {
+resource "aws_instance" "dsf_hub_instance" {
 
   ami           = var.hub_amis_id[var.aws_region]
   instance_type = var.hub_instance_type
-  key_name      = aws_key_pair.deployer.key_name
-  subnet_id = aws_subnet.public_subnet.id
+  key_name      = aws_key_pair.dsf_hub_ssh_keypair_creator.key_name
+  subnet_id = aws_subnet.dsf_public_subnet.id
   # associate_public_ip_address = var.hub_public_ip
-  user_data                   = data.template_cloudinit_config.sonar_config.rendered
-  iam_instance_profile = aws_iam_instance_profile.test_profile.id
+  user_data                   = data.template_cloudinit_config.dsf_hub_instance_config.rendered
+  iam_instance_profile = aws_iam_instance_profile.dsf_hub_instance_iam_profile.id
   # vpc_security_group_ids      = [aws_security_group.public.id]
   tags = {
     Name = var.hub_machine_name
@@ -52,8 +52,8 @@ resource "aws_instance" "sonar_hub_instance" {
 
 }
 
-resource "aws_iam_instance_profile" "test_profile" {
-  name = "hub_test_profile"
+resource "aws_iam_instance_profile" "dsf_hub_instance_iam_profile" {
+  name = "hub_dsf_hub_instance_iam_profile"
   role = "${aws_iam_role.dsf_hub_role.name}"
 }
 
@@ -73,11 +73,11 @@ resource "aws_iam_role" "dsf_hub_role" {
     ]
   })
 }
-# resource "aws_instance" "sonar_hub_instance" {
+# resource "aws_instance" "dsf_hub_instance" {
 #   ami           = var.hub_amis_id[var.aws_region]
 #   instance_type = var.hub_instance_type
 #   key_name      = aws_key_pair.deployer.key_name
-#   subnet_id = aws_subnet.public_subnet.id
+#   subnet_id = aws_subnet.dsf_public_subnet.id
 #   tags = {
 #     Name = "sonar-hub"
 #   }
@@ -97,7 +97,7 @@ resource "aws_iam_role" "dsf_hub_role" {
 
 ## Attach an additional storage device to DSF hub files
 #data "aws_subnet" "selected_subnet" {
-#  id = aws_subnet.public_subnet.id
+#  id = aws_subnet.dsf_public_subnet.id
 #}
 #
 #resource "aws_volume_attachment" "ebs_att" {

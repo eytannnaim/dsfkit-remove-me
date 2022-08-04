@@ -10,15 +10,15 @@ variable "aws_secret_key" {
   type = string
 }
 
-variable "hub_vpc_cidr" {
+variable "dsf_vpc_cidr" {
   type = string
 }
 
-variable "hub_public_subnet_cidr" {
+variable "hub_dsf_public_subnet_cidr" {
   type = string
 }
 
-variable "hub_private_subnet_cidr" {
+variable "hub_dsf_private_subnet_cidr" {
   type = string
 }
 

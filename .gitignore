@@ -1,5 +1,5 @@
-key
-key.pub
+dsf_hub_ssh_key
+dsf_hub_ssh_key.pub
 **/.terraform/*
 *terraform.tfstate
 *terraform.tfstate.backup
