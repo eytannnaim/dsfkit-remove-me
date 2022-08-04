@@ -39,7 +39,7 @@ data "template_cloudinit_config" "dsf_hub_instance_config" {
 resource "aws_instance" "dsf_hub_instance" {
 
   ami           = var.hub_amis_id[var.aws_region]
-  instance_type = var.hub_instance_type
+  instance_type = var.dsf_hub_instance_type
   key_name      = aws_key_pair.dsf_hub_ssh_keypair_creator.key_name
   subnet_id = aws_subnet.dsf_public_subnet.id
   # associate_public_ip_address = var.hub_public_ip
@@ -47,7 +47,7 @@ resource "aws_instance" "dsf_hub_instance" {
   iam_instance_profile = aws_iam_instance_profile.dsf_hub_instance_iam_profile.id
   # vpc_security_group_ids      = [aws_security_group.public.id]
   tags = {
-    Name = var.hub_machine_name
+    Name = var.dsf_hub_instance_name
   }
 
 }
@@ -75,7 +75,7 @@ resource "aws_iam_role" "dsf_hub_role" {
 }
 # resource "aws_instance" "dsf_hub_instance" {
 #   ami           = var.hub_amis_id[var.aws_region]
-#   instance_type = var.hub_instance_type
+#   instance_type = var.dsf_hub_instance_type
 #   key_name      = aws_key_pair.deployer.key_name
 #   subnet_id = aws_subnet.dsf_public_subnet.id
 #   tags = {
@@ -107,8 +107,8 @@ resource "aws_iam_role" "dsf_hub_role" {
 #}
 #
 #resource "aws_ebs_volume" "ebs_vol" {
-#  size              = var.hub_disk_size
-#  type              = var.hub_disk_type
+#  size              = var.dsf_hub_disk_size
+#  type              = var.dsf_hub_disk_type
 #  availability_zone = data.aws_subnet.selected_subnet.availability_zone
 #}
 

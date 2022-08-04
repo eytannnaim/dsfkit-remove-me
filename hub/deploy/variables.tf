@@ -22,19 +22,15 @@ variable "hub_dsf_private_subnet_cidr" {
   type = string
 }
 
-variable "hub_instance_type" {
+variable "dsf_hub_instance_type" {
   type = string
 }
 
-variable "hub_machine_name" {
+variable "dsf_hub_instance_name" {
   default = "imperva-dsf-hub"
 }
 
-resource "random_password" "password" {
-  length           = 16
-  special          = true
-  override_special = "!#$%&*()-_=+[]{}<>:?"
-}
+
 
 data "http" "workstartion_public_ip" {
   url = "http://ifconfig.me"
@@ -42,13 +38,20 @@ data "http" "workstartion_public_ip" {
 
 variable "vpn_security_group_ingress" { default = ["80.179.69.240/28"] }
 
-variable "hub_disk_size" {
+variable "dsf_hub_disk_size" {
   default = 60
 }
 
-variable "hub_disk_type" {
+variable "dsf_hub_disk_type" {
   default = "gp3"
 }
+
+
+# resource "random_password" "password" {
+#   length           = 16
+#   special          = true
+#   override_special = "!#$%&*()-_=+[]{}<>:?"
+# }
 
 # variable "hub_public_ip" {
 #   default = true

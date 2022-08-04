@@ -14,7 +14,6 @@ provider "aws" {
   default_tags {
     tags = {
       env         = "development"
-#      owner       = "eytan"
       product     = "imperva-dsf-hub"
       managed-by  = "terraform"
     }

@@ -8,5 +8,5 @@ output "hub_url" {
 }
 
 output "ssh_command" {
-    value     = join("", ["ssh  -i key ec2-user@", aws_eip.dsf_hub_eip.public_ip])
+    value     = join("", ["ssh  -i dsf_hub_ssh_key ec2-user@", aws_eip.dsf_hub_eip.public_ip])
 }
