@@ -3,14 +3,18 @@ resource "aws_eip" "dsf_hub_eip" {
   vpc      = true
 }
 
-resource "aws_key_pair" "dsf_hub_ssh_keypair_creator" {
-  key_name   = "dsf_hub_ssh_keypair_creator"
+resource "random_id" "id" {
+  byte_length = 8
+}
+
+resource "aws_key_pair" "dsf_hub_ssh_keypair" {
+  key_name   = "dsf_hub_ssh_keypair_${random_id.id.hex}"
   public_key =  data.local_file.dsf_hub_ssh_key.content
 }
 
 resource "null_resource" "dsf_hub_ssh_key_pair_creator" {
   provisioner "local-exec" {
-    command = "[ -f 'dsf_hub_ssh_key' ] || ssh-keygen -t rsa -f 'dsf_hub_ssh_key' -P ''"
+    command = "[ -f 'dsf_hub_ssh_key' ] || ssh-keygen -t rsa -f 'dsf_hub_ssh_key' -P '' && chmod 400 hub_key"
     interpreter = ["/bin/bash", "-c"]
   }
 }
@@ -40,7 +44,7 @@ resource "aws_instance" "dsf_hub_instance" {
 
   ami           = var.hub_amis_id[var.aws_region]
   instance_type = var.dsf_hub_instance_type
-  key_name      = aws_key_pair.dsf_hub_ssh_keypair_creator.key_name
+  key_name      = aws_key_pair.dsf_hub_ssh_keypair.key_name
   subnet_id = aws_subnet.dsf_public_subnet.id
   # associate_public_ip_address = var.hub_public_ip
   user_data                   = data.template_cloudinit_config.dsf_hub_instance_config.rendered
@@ -53,7 +57,7 @@ resource "aws_instance" "dsf_hub_instance" {
 }
 
 resource "aws_iam_instance_profile" "dsf_hub_instance_iam_profile" {
-  name = "hub_dsf_hub_instance_iam_profile"
+  name = "hub_dsf_hub_instance_iam_profile_${random_id.id.hex}"
   role = "${aws_iam_role.dsf_hub_role.name}"
 }
 
@@ -73,15 +77,6 @@ resource "aws_iam_role" "dsf_hub_role" {
     ]
   })
 }
-# resource "aws_instance" "dsf_hub_instance" {
-#   ami           = var.hub_amis_id[var.aws_region]
-#   instance_type = var.dsf_hub_instance_type
-#   key_name      = aws_key_pair.deployer.key_name
-#   subnet_id = aws_subnet.dsf_public_subnet.id
-#   tags = {
-#     Name = "sonar-hub"
-#   }
-# }
 
 # consider removing this
 #resource "aws_kms_key" "imperva_hub_kms" {
