@@ -47,7 +47,7 @@ resource "aws_instance" "dsf_hub_instance" {
   iam_instance_profile = aws_iam_instance_profile.dsf_hub_instance_iam_profile.id
   # vpc_security_group_ids      = [aws_security_group.public.id]
   tags = {
-    Name = var.dsf_hub_instance_name
+    Name = "imperva-dsf-hub"
   }
 
 }

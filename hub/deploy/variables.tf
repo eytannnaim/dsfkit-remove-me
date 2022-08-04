@@ -26,17 +26,11 @@ variable "dsf_hub_instance_type" {
   type = string
 }
 
-variable "dsf_hub_instance_name" {
-  default = "imperva-dsf-hub"
-}
-
-
-
 data "http" "workstartion_public_ip" {
   url = "http://ifconfig.me"
 }
 
-variable "vpn_security_group_ingress" { default = ["80.179.69.240/28"] }
+variable "vpn_security_group_cidr" { default = ["80.179.69.240/28"] }
 
 variable "dsf_hub_disk_size" {
   default = 60
