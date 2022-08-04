@@ -14,14 +14,14 @@ resource "aws_key_pair" "dsf_hub_ssh_keypair" {
 
 resource "null_resource" "dsf_hub_ssh_key_pair_creator" {
   provisioner "local-exec" {
-    command = "[ -f 'dsf_hub_ssh_key' ] || ssh-keygen -t rsa -f 'dsf_hub_ssh_key' -P '' && chmod 400 dsf_hub_ssh_key"
+    command = "[ -f 'dsf_hub_ssh_key' ] || ssh-keygen -t rsa -f 'dsf_hub_ssh_key' -P '' -q && chmod 400 dsf_hub_ssh_key"
     interpreter = ["/bin/bash", "-c"]
   }
 }
 
 resource "null_resource" "dsf_hub_ssh_federation_key_pair_creator" {
   provisioner "local-exec" {
-    command = "rm -f 'dsf_hub_federation_ssh_key' && ssh-keygen -t rsa -f 'dsf_hub_federation_ssh_key' -P '' && chmod 400 dsf_hub_federation_ssh_key"
+    command = "rm -f dsf_hub_federation_ssh_key{,.pub} && ssh-keygen -b 4096 -t rsa -f 'dsf_hub_federation_ssh_key' -P '' -q && chmod 400 dsf_hub_federation_ssh_key"
     interpreter = ["/bin/bash", "-c"]
   }
 }
@@ -102,7 +102,7 @@ resource "aws_instance" "dsf_hub_instance" {
   tags = {
     Name = "imperva-dsf-hub"
   }
-
+  depends_on = [aws_secretsmanager_secret_version.dsf_hub_federation_public_key_ver, aws_secretsmanager_secret_version.dsf_hub_federation_private_key_ver]
 }
 
 resource "aws_iam_instance_profile" "dsf_hub_instance_iam_profile" {
