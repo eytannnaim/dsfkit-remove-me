@@ -21,7 +21,7 @@ resource "null_resource" "dsf_hub_ssh_key_pair_creator" {
 
 resource "null_resource" "dsf_hub_ssh_federation_key_pair_creator" {
   provisioner "local-exec" {
-    command = "rm -f dsf_hub_federation_ssh_key{,.pub} && ssh-keygen -b 4096 -t rsa -f 'dsf_hub_federation_ssh_key' -P '' -q && chmod 400 dsf_hub_federation_ssh_key"
+    command = "rm -f dsf_hub_federation_ssh_key{,.pub} && ssh-keygen -b 4096 -t ed25519 -f 'dsf_hub_federation_ssh_key' -P '' -q && chmod 400 dsf_hub_federation_ssh_key"
     interpreter = ["/bin/bash", "-c"]
   }
 }
