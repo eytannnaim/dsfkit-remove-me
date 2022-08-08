@@ -91,6 +91,11 @@ resource "aws_network_interface_sg_attachment" "dsf_sg_attachment" {
   network_interface_id = aws_instance.dsf_hub_instance.primary_network_interface_id
 }
 
+resource "aws_network_interface_sg_attachment" "dsf_sg_attachment2" {
+  security_group_id    = aws_security_group.public.id
+  network_interface_id = aws_instance.dsf_hub_gw_instance.primary_network_interface_id
+}
+
 resource "aws_route_table" "sonar-hub-public-rt" {
   vpc_id = aws_vpc.dsf_vpc.id
 
