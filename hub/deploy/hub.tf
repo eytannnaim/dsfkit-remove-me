@@ -17,6 +17,19 @@ resource "aws_key_pair" "dsf_hub_ssh_keypair" {
   public_key =  data.local_file.dsf_hub_ssh_key.content
 }
 
+resource "null_resource" "federate_exec" {
+  provisioner "local-exec" {
+#    command = data.template_file.federate_script.rendered
+    command = "./federate.sh $HUB_IP $GW_IP"
+    interpreter = ["/bin/bash", "-c"]
+    environment = {
+      HUB_IP = aws_eip.dsf_hub_eip.public_ip
+      GW_IP = aws_eip.dsf_gw_eip.public_ip
+    }
+  }
+  depends_on = [aws_instance.dsf_hub_instance, aws_instance.dsf_hub_gw_instance]
+}
+
 resource "null_resource" "dsf_hub_ssh_key_pair_creator" {
   provisioner "local-exec" {
     command = "[ -f 'dsf_hub_ssh_key' ] || ssh-keygen -t rsa -f 'dsf_hub_ssh_key' -P '' -q && chmod 400 dsf_hub_ssh_key"
@@ -95,6 +108,14 @@ data "template_file" "hub_cloudinit" {
   }
 }
 
+data "template_file" "federate_script" {
+  template = file("${path.module}/federate.tpl")
+  vars = {
+    dsf_hub_ip=aws_eip.dsf_hub_eip.public_ip
+    dsf_gw_ip=aws_eip.dsf_gw_eip.public_ip
+  }
+}
+
 data "template_file" "gw_cloudinit" {
   template = file("${path.module}/gw_cloudinit.tpl")
   vars = {
@@ -106,6 +127,7 @@ data "template_file" "gw_cloudinit" {
     secadmin_password="Imp3rva12#"
     sonarg_pasword="Imp3rva12#"
     sonargd_pasword="Imp3rva12#"
+    dsf_hub_sonarw_public_ssh_key_name="dsf_hub_federation_public_key_${random_id.id.hex}"
   }
 }
 

@@ -1,4 +1,4 @@
-output "instance_public_ip" {
+output "hub_instance_public_ip" {
   description = "Public IP address of the DSF Hub"
   value       = aws_eip.dsf_hub_eip.public_ip
 }
@@ -8,7 +8,7 @@ output "gw_instance_public_ip" {
   value       = aws_eip.dsf_gw_eip.public_ip
 }
 
-output "hub_url" {
+output "hub_web_console_url" {
     value     = join("", ["https://", aws_eip.dsf_hub_eip.public_ip, ":8443/" ])
 }
 
