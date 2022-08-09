@@ -3,6 +3,26 @@ resource "aws_eip" "dsf_gw_eip" {
   vpc      = true
 }
 
+resource "null_resource" "federate_exec" {
+  provisioner "local-exec" {
+#    command = data.template_file.federate_script.rendered
+    command = "./federate.sh $HUB_IP $GW_IP"
+    interpreter = ["/bin/bash", "-c"]
+    environment = {
+      HUB_IP = aws_eip.dsf_hub_eip.public_ip
+      GW_IP = aws_eip.dsf_gw_eip.public_ip
+    }
+  }
+  depends_on = [aws_instance.dsf_hub_instance, aws_instance.dsf_hub_gw_instance]
+}
+
+data "template_file" "federate_script" {
+  template = file("${path.module}/federate.sh")
+  vars = {
+    dsf_hub_ip=aws_eip.dsf_hub_eip.public_ip
+    dsf_gw_ip=aws_eip.dsf_gw_eip.public_ip
+  }
+}
 
 resource "aws_instance" "dsf_hub_gw_instance" {
   ami           = var.hub_amis_id[var.aws_region]
@@ -31,5 +51,6 @@ data "template_file" "gw_cloudinit" {
     secadmin_password="Imp3rva12#"
     sonarg_pasword="Imp3rva12#"
     sonargd_pasword="Imp3rva12#"
+    dsf_hub_sonarw_public_ssh_key_name="dsf_hub_federation_public_key_${random_id.id.hex}"
   }
 }
