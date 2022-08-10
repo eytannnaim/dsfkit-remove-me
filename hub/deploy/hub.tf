@@ -124,43 +124,22 @@ resource "aws_iam_role" "dsf_hub_role" {
   })
 }
 
-# consider removing this
-#resource "aws_kms_key" "imperva_hub_kms" {
-#  description             = "Imperva DSF Hub kms key"
-##  deletion_window_in_days = 10
-#}
-#
-#data "aws_kms_ciphertext" "encrypted_password" {
-#  key_id     = aws_kms_key.imperva_hub_kms.key_id
-#  plaintext  = random_password.password.result
-#  depends_on = [aws_kms_key.imperva_hub_kms]
-#}
+# Attach an additional storage device to DSF hub files
+data "aws_subnet" "selected_subnet" {
+  id = aws_subnet.dsf_public_subnet.id
+}
 
-## Attach an additional storage device to DSF hub files
-#data "aws_subnet" "selected_subnet" {
-#  id = aws_subnet.dsf_public_subnet.id
-#}
-#
-#resource "aws_volume_attachment" "ebs_att" {
-#  device_name = "/dev/sdb"
-#  volume_id   = aws_ebs_volume.ebs_vol.id
-#  instance_id = aws_instance.dsf_hub_instance.id
-#}
-#
-#resource "aws_ebs_volume" "ebs_vol" {
-#  size              = var.dsf_hub_disk_size
-#  type              = var.dsf_hub_disk_type
-#  availability_zone = data.aws_subnet.selected_subnet.availability_zone
-#}
+resource "aws_volume_attachment" "ebs_att" {
+  device_name = "/dev/sdb"
+  volume_id   = aws_ebs_volume.ebs_vol.id
+  instance_id = aws_instance.dsf_hub_instance.id
+}
 
-# gaps:
-# how to copy the installation file
-# add time wait condition that waits until GUI is visible (6 minutes to gui to became active)
-# remove you role
-# solve pem issue
-# solve the package download issue
-# propate random password to hub
-# Add additional logical volume for DSF hub files - this is an instance depended solution and therefore should be handled in the future
-# make userdata run always to fix overcome issues that might be affected by a reboot or a disk change or a instance change - https://aws.amazon.com/premiumsupport/knowledge-center/execute-user-data-ec2/
-# add condition variable and wait until installation complete
-# add some feedback for the hub installation
+resource "aws_ebs_volume" "ebs_vol" {
+  size              = var.dsf_hub_disk_size
+  type              = var.dsf_hub_disk_type
+  availability_zone = data.aws_subnet.selected_subnet.availability_zone
+  tags = {
+    Name = "imperva-dsf-hub-volume"
+  }
+}

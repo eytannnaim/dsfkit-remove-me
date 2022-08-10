@@ -15,7 +15,6 @@ variable "user_password" {
   default = "Imp3rva12#"
 }
 
-
 variable "dsf_vpc_cidr" {
   type = string
 }
@@ -39,7 +38,11 @@ data "http" "workstartion_public_ip" {
 variable "vpn_security_group_cidr" { default = ["80.179.69.240/28"] }
 
 variable "dsf_hub_disk_size" {
-  default = 60
+  default = 510
+  validation {
+    condition     = var.dsf_hub_disk_size >= 500
+    error_message = "Disk size must be at least 500GB"
+  }
 }
 
 variable "dsf_hub_disk_type" {
