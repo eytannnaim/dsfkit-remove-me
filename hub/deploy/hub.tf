@@ -133,6 +133,7 @@ resource "aws_volume_attachment" "ebs_att" {
   device_name = "/dev/sdb"
   volume_id   = aws_ebs_volume.ebs_vol.id
   instance_id = aws_instance.dsf_hub_instance.id
+  stop_instance_before_detaching = true
 }
 
 resource "aws_ebs_volume" "ebs_vol" {
