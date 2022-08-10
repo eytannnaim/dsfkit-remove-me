@@ -2,14 +2,6 @@ variable "aws_region" {
   type = string
 }
 
-variable "aws_access_key" {
-  type = string
-}
-
-variable "aws_secret_key" {
-  type = string
-}
-
 variable "user_password" {
   type = string
   default = "Imp3rva12#"
