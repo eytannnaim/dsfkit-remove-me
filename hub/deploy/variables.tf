@@ -10,6 +10,12 @@ variable "aws_secret_key" {
   type = string
 }
 
+variable "user_password" {
+  type = string
+  default = "Imp3rva12#"
+}
+
+
 variable "dsf_vpc_cidr" {
   type = string
 }

@@ -77,14 +77,10 @@ data "template_cloudinit_config" "dsf_hub_instance_config" {
 data "template_file" "hub_cloudinit" {
   template = file("${path.module}/hub_cloudinit.tpl")
   vars = {
-    #admin_password=jsondecode(data.aws_secretsmanager_secret_version.sonar-secrets.secret_string)["admin_password"]
-    #secadmin_password=jsondecode(data.aws_secretsmanager_secret_version.sonar-secrets.secret_string)["secadmin_password"]
-    #sonarg_pasword=jsondecode(data.aws_secretsmanager_secret_version.sonar-secrets.secret_string)["sonarg_pasword"]
-    #sonargd_pasword=jsondecode(data.aws_secretsmanager_secret_version.sonar-secrets.secret_string)["sonargd_pasword"]
-    admin_password="Imp3rva12#"
-    secadmin_password="Imp3rva12#"
-    sonarg_pasword="Imp3rva12#"
-    sonargd_pasword="Imp3rva12#"
+    admin_password=var.user_password
+    secadmin_password=var.user_password
+    sonarg_pasword=var.user_password
+    sonargd_pasword=var.user_password
     dsf_hub_sonarw_private_ssh_key_name="dsf_hub_federation_private_key_${random_id.id.hex}"
     dsf_hub_sonarw_public_ssh_key_name="dsf_hub_federation_public_key_${random_id.id.hex}"
   }
