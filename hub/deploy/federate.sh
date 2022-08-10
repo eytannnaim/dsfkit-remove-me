@@ -13,6 +13,6 @@ while ! nc -z -v ${dsf_gw_ip} 8443 &>/dev/null; do
     sleep 5
 done
 sleep 60
-ssh -o "StrictHostKeyChecking no" -i ~/dsf_hub_ssh_key.pem ec2-user@${dsf_hub_ip} -C 'sudo $JSONAR_BASEDIR/bin/federated warehouse '${dsf_hub_ip}' '${dsf_gw_ip}
-ssh -o "StrictHostKeyChecking no" -i ~/dsf_hub_ssh_key.pem ec2-user@${dsf_gw_ip} -C 'sudo $JSONAR_BASEDIR/bin/federated remote'
+ssh -o "StrictHostKeyChecking no" -i dsf_hub_ssh_key ec2-user@${dsf_hub_ip} -C 'sudo $JSONAR_BASEDIR/bin/federated warehouse '${dsf_hub_ip}' '${dsf_gw_ip}
+ssh -o "StrictHostKeyChecking no" -i dsf_hub_ssh_key ec2-user@${dsf_gw_ip} -C 'sudo $JSONAR_BASEDIR/bin/federated remote'
 
