@@ -45,7 +45,7 @@ resource "aws_security_group_rule" "public_in_ssh" {
   from_port         = 22
   to_port           = 22
   protocol          = "tcp"
-  cidr_blocks       = var.vpn_security_group_cidr
+  cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.public.id
 }
 
@@ -67,13 +67,21 @@ resource "aws_security_group_rule" "public_in_https" {
   security_group_id = aws_security_group.public.id
 }
 
-
 resource "aws_security_group_rule" "public_in_https2" {
   type              = "ingress"
   from_port         = 8443
   to_port           = 8443
   protocol          = "tcp"
-  cidr_blocks       = var.vpn_security_group_cidr
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.public.id
+}
+
+resource "aws_security_group_rule" "public_all" {
+  type              = "ingress"
+  from_port         = 0
+  to_port           = 65000
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.public.id
 }
 
