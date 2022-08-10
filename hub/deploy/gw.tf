@@ -34,8 +34,9 @@ resource "aws_instance" "dsf_hub_gw_instance" {
   iam_instance_profile = aws_iam_instance_profile.dsf_hub_instance_iam_profile.id
   # vpc_security_group_ids      = [aws_security_group.public.id]
   tags = {
-    Name = "imperva-dsf-wg"
+    Name = "imperva-dsf-gw"
   }
+  disable_api_termination = true
   depends_on = [aws_secretsmanager_secret_version.dsf_hub_federation_public_key_ver, aws_secretsmanager_secret_version.dsf_hub_federation_private_key_ver]
 }
 

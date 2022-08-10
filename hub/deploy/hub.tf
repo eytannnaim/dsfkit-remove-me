@@ -98,6 +98,7 @@ resource "aws_instance" "dsf_hub_instance" {
   tags = {
     Name = "imperva-dsf-hub"
   }
+  disable_api_termination = true
   depends_on = [aws_secretsmanager_secret_version.dsf_hub_federation_public_key_ver, aws_secretsmanager_secret_version.dsf_hub_federation_private_key_ver]
 }
 
