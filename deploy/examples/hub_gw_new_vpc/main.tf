@@ -43,11 +43,13 @@ module "vpc" {
 module "hub" {
   source = "../../modules/hub"
 
-  aws_region = local.region
+  region = local.region
   
   name = local.deployment-name
   
   subnet_id = module.vpc.public_subnets[0]
+  
+  admin_password = "Imp3rva12#"
   
   #cidr = "10.0.0.0/16"
   #

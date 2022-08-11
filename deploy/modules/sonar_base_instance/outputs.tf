@@ -12,10 +12,6 @@ output "hub_web_console_url" {
     value     = join("", ["https://", aws_eip.dsf_hub_eip.public_ip, ":8443/" ])
 }
 
-output "dsf_hub_pass" {
-    value     = var.user_password
-}
-
 output "ssh_command" {
     value     = join("", ["ssh -i dsf_hub_ssh_key ec2-user@", aws_eip.dsf_hub_eip.public_ip])
 }
