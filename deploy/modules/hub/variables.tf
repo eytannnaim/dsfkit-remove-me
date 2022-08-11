@@ -14,19 +14,19 @@ variable "name" {
 
 variable "subnet_id" {
   type = string
-  description = "Subnet id for the ec2 instance"
+  description = "Subnet id for the DSF hub instance"
 }
 
-variable "dsf_hub_instance_type" {
+variable "instance_type" {
   type = string
   default = "t2.2xlarge"
-  description = "Ec2 instance type for the hub"
+  description = "Ec2 instance type for the DSF hub"
 }
 
-variable "dsf_hub_disk_size" {
+variable "disk_size" {
   default = 510
   validation {
-    condition     = var.dsf_hub_disk_size >= 500
-    error_message = "Disk size must be at least 500GB"
+    condition     = var.disk_size >= 500
+    error_message = "DSF hub instance disk size must be at least 500GB"
   }
 }

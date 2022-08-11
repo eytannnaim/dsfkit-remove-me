@@ -67,8 +67,3 @@ resource "aws_security_group_rule" "public_all" {
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.public.id
 }
-
-resource "aws_network_interface_sg_attachment" "dsf_sg_attachment" {
-  security_group_id    = aws_security_group.public.id
-  network_interface_id = aws_instance.dsf_hub_instance.primary_network_interface_id
-}

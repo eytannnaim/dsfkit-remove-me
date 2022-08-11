@@ -7,13 +7,7 @@ terraform {
   }
 }
 
-provider "aws" {
-  region     = var.region
-  default_tags {
-    tags = {
-      env         = "development"
-      product     = "imperva-dsf-hub"
-      managed-by  = "terraform"
-    }
-  }
-}
+#provider "aws" {
+#  region     = var.region
+#}
+#
