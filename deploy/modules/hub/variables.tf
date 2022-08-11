@@ -5,16 +5,30 @@ variable "region" {
 variable "admin_password" {
   type = string
   sensitive = true
+  description = "Admin password"
+  validation {
+    condition = length(var.admin_password) > 8
+    error_message = "Admin password must be at least 8 characters"
+  }
 }
 
 variable "name" {
   type = string
   default = "imperva-dsf-hub"
+  description = "Deployment name"
+  validation {
+    condition = length(var.name) > 3
+    error_message = "Deployment name must be at least 3 characters"
+  }
 }
 
 variable "subnet_id" {
   type = string
   description = "Subnet id for the DSF hub instance"
+  validation {
+    condition     = length(var.subnet_id) >= 15 && substr(var.subnet_id, 0, 7) == "subnet-"
+    error_message = "Subnet id is invalid. Must be subnet-********."
+  }
 }
 
 variable "instance_type" {

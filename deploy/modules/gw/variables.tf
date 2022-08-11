@@ -5,16 +5,30 @@ variable "region" {
 variable "admin_password" {
   type = string
   sensitive = true
+  description = "Admin password"
+  validation {
+    condition = length(var.admin_password) > 8
+    error_message = "Admin password must be at least 8 characters"
+  }
 }
 
 variable "name" {
   type = string
   default = "imperva-dsf-agentless-gw"
+  description = "Deployment name"
+  validation {
+    condition = length(var.name) > 3
+    error_message = "Deployment name must be at least 3 characters"
+  }
 }
 
 variable "subnet_id" {
   type = string
   description = "Subnet id for the DSF agentless gw ec2 instance"
+  validation {
+    condition     = length(var.subnet_id) >= 15 && substr(var.subnet_id, 0, 7) == "subnet-"
+    error_message = "Subnet id is invalid. Must be subnet-********."
+  }
 }
 
 variable "instance_type" {
@@ -44,4 +58,8 @@ variable "key_pair" {
 variable "hub_ip" {
   type = string
   description = "DSF hub IP address"
+  validation {
+    condition = can(regex("^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$", var.hub_ip))
+    error_message = "Invalid IP address provided."
+  }
 }
