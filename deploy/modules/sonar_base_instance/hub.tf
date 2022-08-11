@@ -1,5 +1,7 @@
 locals {
-  ebs_state_disk_type = "gp3"
+  ebs_state_disk_type   = "gp3"
+  ebs_state_iops        = 16000
+  ebs_state_throughput  = 1000
 }
 
 resource "aws_eip" "dsf_instance_eip" {
@@ -58,6 +60,8 @@ resource "aws_volume_attachment" "ebs_att" {
 resource "aws_ebs_volume" "ebs_vol" {
   size              = var.ebs_state_disk_size
   type              = local.ebs_state_disk_type
+  iops              = local.ebs_state_iops
+  throughput        = local.ebs_state_throughput
   availability_zone = data.aws_subnet.selected_subnet.availability_zone
   tags = {
     Name = var.name

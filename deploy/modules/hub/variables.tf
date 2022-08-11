@@ -30,3 +30,9 @@ variable "disk_size" {
     error_message = "DSF hub instance disk size must be at least 500GB"
   }
 }
+
+variable sg_ingress_cidr {
+  type = list
+  description = "List of allowed ingress cidr patterns for the DSF hub instance"
+}
+
