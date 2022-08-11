@@ -4,5 +4,5 @@ output "hub_key_pair" {
 }
 
 output "public_eip" {
-    value = module.sonar_base_instance.instance_eip
+    value = module.hub_instance.instance_eip
 }

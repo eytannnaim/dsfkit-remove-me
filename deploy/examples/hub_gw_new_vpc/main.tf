@@ -64,5 +64,6 @@ module "agentless-gw" {
   region            = local.region
   subnet_id         = module.vpc.public_subnets[0]
   admin_password    = local.admin_password
+  hub_ip            = module.hub.public_eip
   key_pair          = module.hub.hub_key_pair
 }

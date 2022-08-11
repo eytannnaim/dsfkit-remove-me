@@ -72,7 +72,7 @@ data "template_file" "hub_cloudinit" {
   depends_on = [aws_secretsmanager_secret_version.dsf_hub_federation_public_key_ver, aws_secretsmanager_secret_version.dsf_hub_federation_private_key_ver]
 }
 
-module "sonar_base_instance" {
+module "hub_instance" {
   source = "../../modules/sonar_base_instance"
   region = var.region
   name = join("-", [var.name, "hub"])

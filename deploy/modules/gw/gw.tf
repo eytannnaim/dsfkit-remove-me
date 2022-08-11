@@ -1,23 +1,14 @@
-#resource "null_resource" "federate_exec" {
-#  provisioner "local-exec" {
-##    command = data.template_file.federate_script.rendered
-#    command = "./federate.sh $HUB_IP $GW_IP"
-#    interpreter = ["/bin/bash", "-c"]
-#    environment = {
-#      HUB_IP = aws_eip.dsf_hub_eip.public_ip
-#      GW_IP = aws_eip.dsf_gw_eip.public_ip
-#    }
-#  }
-#  depends_on = [aws_instance.dsf_hub_instance, aws_instance.dsf_hub_gw_instance]
-#}
-#
-#data "template_file" "federate_script" {
-#  template = file("${path.module}/federate.sh")
-#  vars = {
-#    dsf_hub_ip=aws_eip.dsf_hub_eip.public_ip
-#    dsf_gw_ip=aws_eip.dsf_gw_eip.public_ip
-#  }
-#}
+resource "null_resource" "federate_exec" {
+  provisioner "local-exec" {
+    command = "${path.module}/federate.sh $HUB_IP $GW_IP"
+    interpreter = ["/bin/bash", "-c"]
+    environment = {
+      HUB_IP = var.hub_ip
+      GW_IP = module.gw_instance.instance_eip
+    }
+  }
+  depends_on = [module.gw_instance]
+}
 
 data "template_file" "gw_cloudinit" {
   template = file("${path.module}/gw_cloudinit.tpl")
@@ -30,7 +21,7 @@ data "template_file" "gw_cloudinit" {
   }
 }
 
-module "sonar_base_instance" {
+module "gw_instance" {
   source = "../../modules/sonar_base_instance"
   region = var.region
   name = join("-", [var.name, "gw"])
