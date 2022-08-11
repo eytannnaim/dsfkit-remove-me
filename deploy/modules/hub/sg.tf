@@ -1,32 +1,15 @@
-resource "aws_vpc" "dsf_vpc" {
-  cidr_block = var.dsf_vpc_cidr
-}
 
-resource "aws_subnet" "dsf_public_subnet" {
-  vpc_id     = aws_vpc.dsf_vpc.id
-  cidr_block = var.hub_dsf_public_subnet_cidr
-
-  tags = {
-    Name = "dsf-hub-public-subnet"
-  }
-}
-
-resource "aws_subnet" "dsf_private_subnet" {
-  vpc_id     = aws_vpc.dsf_vpc.id
-  cidr_block = var.hub_dsf_private_subnet_cidr
-
-  tags = {
-    Name = "dsf-hub-private-subnet"
-  }
+data "aws_subnet" "subnet" {
+  id = var.subnet_id
 }
 
 resource "aws_security_group" "public" {
-  name        = "dsf-hub-public-sg"
+  name        = join("-", [var.name, "public", "sg"])
   description = "Public internet access"
-  vpc_id      = aws_vpc.dsf_vpc.id
+  vpc_id      = data.aws_subnet.subnet.vpc_id
 
   tags = {
-    Name = "dsf-hub-public-sg"
+    Name = join("-", [var.name, "sg"])
   }
 }
 
@@ -85,35 +68,7 @@ resource "aws_security_group_rule" "public_all" {
   security_group_id = aws_security_group.public.id
 }
 
-
-resource "aws_internet_gateway" "dsf_internet_gw" {
-  vpc_id = aws_vpc.dsf_vpc.id
-
-  tags = {
-    Name = "dsf-hub-public-gw"
-  }
-}
-
 resource "aws_network_interface_sg_attachment" "dsf_sg_attachment" {
   security_group_id    = aws_security_group.public.id
   network_interface_id = aws_instance.dsf_hub_instance.primary_network_interface_id
-}
-
-resource "aws_network_interface_sg_attachment" "dsf_sg_attachment2" {
-  security_group_id    = aws_security_group.public.id
-  network_interface_id = aws_instance.dsf_hub_gw_instance.primary_network_interface_id
-}
-
-resource "aws_route_table" "sonar-hub-public-rt" {
-  vpc_id = aws_vpc.dsf_vpc.id
-
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.dsf_internet_gw.id
-  }
-}
-
-resource "aws_route_table_association" "dsf_public_subnet_route_table_association" {
-  subnet_id      = aws_subnet.dsf_public_subnet.id
-  route_table_id = aws_route_table.sonar-hub-public-rt.id
 }

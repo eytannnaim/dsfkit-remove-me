@@ -5,22 +5,23 @@ variable "aws_region" {
 variable "user_password" {
   type = string
   default = "Imp3rva12#"
+  sensitive = true
 }
 
-variable "dsf_vpc_cidr" {
+variable "name" {
   type = string
+  default = "imperva-dsf"
 }
 
-variable "hub_dsf_public_subnet_cidr" {
+variable "subnet_id" {
   type = string
-}
-
-variable "hub_dsf_private_subnet_cidr" {
-  type = string
+  description = "Subnet id for the ec2 instance"
 }
 
 variable "dsf_hub_instance_type" {
   type = string
+  default = "t2.2xlarge"
+  description = "Ec2 instance type for the hub server"
 }
 
 data "http" "workstartion_public_ip" {
@@ -36,11 +37,6 @@ variable "dsf_hub_disk_size" {
     error_message = "Disk size must be at least 500GB"
   }
 }
-
-variable "dsf_hub_disk_type" {
-  default = "gp3"
-}
-
 
 # resource "random_password" "password" {
 #   length           = 16

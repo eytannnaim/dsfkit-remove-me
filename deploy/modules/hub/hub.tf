@@ -1,3 +1,7 @@
+locals {
+  dsf_hub_disk_type = "gp3"
+}
+
 resource "aws_eip" "dsf_hub_eip" {
   instance = aws_instance.dsf_hub_instance.id
   vpc      = true
@@ -36,7 +40,7 @@ data "local_file" "dsf_hub_public_ssh_federation_key" {
   depends_on = [null_resource.dsf_hub_ssh_federation_key_pair_creator]
 }
 
-data "local_file" "dsf_hub_private_ssh_federation_key" {
+data "local_sensitive_file" "dsf_hub_private_ssh_federation_key" {
   filename = "dsf_hub_federation_ssh_key"
   depends_on = [null_resource.dsf_hub_ssh_federation_key_pair_creator]
 }
@@ -58,7 +62,7 @@ resource "aws_secretsmanager_secret" "dsf_hub_federation_private_key" {
 
 resource "aws_secretsmanager_secret_version" "dsf_hub_federation_private_key_ver" {
   secret_id     = aws_secretsmanager_secret.dsf_hub_federation_private_key.id
-  secret_string = data.local_file.dsf_hub_private_ssh_federation_key.content
+  secret_string = data.local_sensitive_file.dsf_hub_private_ssh_federation_key.content
 }
 
 data "template_cloudinit_config" "dsf_hub_instance_config" {
@@ -90,13 +94,13 @@ resource "aws_instance" "dsf_hub_instance" {
   ami           = var.hub_amis_id[var.aws_region]
   instance_type = var.dsf_hub_instance_type
   key_name      = aws_key_pair.dsf_hub_ssh_keypair.key_name
-  subnet_id = aws_subnet.dsf_public_subnet.id
+  subnet_id = var.subnet_id
   # associate_public_ip_address = var.hub_public_ip
   user_data                   = data.template_file.hub_cloudinit.rendered
   iam_instance_profile = aws_iam_instance_profile.dsf_hub_instance_iam_profile.id
   # vpc_security_group_ids      = [aws_security_group.public.id]
   tags = {
-    Name = "imperva-dsf-hub"
+    Name = join("-", [var.name, "hub" ])
   }
   disable_api_termination = true
   depends_on = [aws_secretsmanager_secret_version.dsf_hub_federation_public_key_ver, aws_secretsmanager_secret_version.dsf_hub_federation_private_key_ver]
@@ -126,7 +130,7 @@ resource "aws_iam_role" "dsf_hub_role" {
 
 # Attach an additional storage device to DSF hub files
 data "aws_subnet" "selected_subnet" {
-  id = aws_subnet.dsf_public_subnet.id
+  id = var.subnet_id
 }
 
 resource "aws_volume_attachment" "ebs_att" {
@@ -138,9 +142,9 @@ resource "aws_volume_attachment" "ebs_att" {
 
 resource "aws_ebs_volume" "ebs_vol" {
   size              = var.dsf_hub_disk_size
-  type              = var.dsf_hub_disk_type
+  type              = local.dsf_hub_disk_type
   availability_zone = data.aws_subnet.selected_subnet.availability_zone
   tags = {
-    Name = "imperva-dsf-hub-volume"
+    Name = join("-", [var.name, "hub", "volume"])
   }
 }

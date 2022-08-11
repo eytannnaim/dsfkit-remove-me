@@ -28,7 +28,7 @@ resource "aws_instance" "dsf_hub_gw_instance" {
   ami           = var.hub_amis_id[var.aws_region]
   instance_type = var.dsf_hub_instance_type
   key_name      = aws_key_pair.dsf_hub_ssh_keypair.key_name
-  subnet_id = aws_subnet.dsf_public_subnet.id
+  subnet_id     = var.subnet_id
   # associate_public_ip_address = var.hub_public_ip
   user_data                   = data.template_file.gw_cloudinit.rendered
   iam_instance_profile = aws_iam_instance_profile.dsf_hub_instance_iam_profile.id
