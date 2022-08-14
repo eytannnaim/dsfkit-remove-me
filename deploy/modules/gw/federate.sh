@@ -14,7 +14,7 @@ while ! nc -z -v ${dsf_gw_ip} 8443 &>/dev/null; do
 done
 
 # This sleep is a WA for federetion bug. This should be replaced with some grep on the sonar logs (intallation files)
-sleep 60
+sleep 120
 
 ssh -o "StrictHostKeyChecking no" -i dsf_hub_ssh_key ec2-user@${dsf_hub_ip} << HERE
 while [ -f sync_file ]; do
