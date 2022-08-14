@@ -26,5 +26,6 @@ export JSONAR_LOCALDIR
 export JSONAR_VERSION
 EOF
 
-/usr/local/bin/aws secretsmanager get-secret-value --secret-id ${dsf_hub_sonarw_public_ssh_key_name} --query SecretString --output text >> /home/sonarw/.ssh/authorized_keys
-chown sonarw:sonar /home/sonarw/.ssh/authorized_keys
+mkdir -p /home/sonarw/.ssh
+echo "${federation_public_key}" >> /home/sonarw/.ssh/authorized_keys
+chown -R sonarw:sonar /home/sonarw

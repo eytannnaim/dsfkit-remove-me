@@ -17,7 +17,7 @@ data "template_file" "gw_cloudinit" {
     secadmin_password   = var.admin_password
     sonarg_pasword      = var.admin_password
     sonargd_pasword     = var.admin_password
-    dsf_hub_sonarw_public_ssh_key_name = "dsf_hub_federation_public_key_${var.name}"
+    federation_public_key = var.federation_public_key
   }
 }
 

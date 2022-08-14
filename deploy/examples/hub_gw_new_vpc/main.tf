@@ -19,7 +19,7 @@ locals {
 }
 
 data "http" "workstartion_public_ip" {
-  url = "http://ifconfig.me"
+  url = "https://ifconfig.me"
 }
 
 module "vpc" {
@@ -46,12 +46,14 @@ module "hub" {
 }
 
 module "agentless_gw" {
+  for_each          = toset( [ "1", "2", "3" ] )
   source            = "../../modules/gw"
-  name              = join("-", [local.deployment-name, local.salt])
+  name              = join("-", [local.deployment-name, local.salt, each.value])
   region            = local.region
-  subnet_id         = module.vpc.public_subnets[0]
   admin_password    = local.admin_password
+  subnet_id         = module.vpc.public_subnets[0]
   hub_ip            = module.hub.public_eip
   key_pair          = module.hub.hub_key_pair
+  federation_public_key = module.hub.federation_public_key
   sg_ingress_cidr   = concat([join("/", [data.http.workstartion_public_ip.body, "32"])], [join("/", [module.hub.public_eip, "32"])])
 }

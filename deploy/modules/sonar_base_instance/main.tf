@@ -15,34 +15,12 @@ resource "aws_instance" "dsf_base_instance" {
   key_name                      = var.key_pair
   subnet_id                     = var.subnet_id
   user_data                     = var.ec2_user_data
-  iam_instance_profile          = aws_iam_instance_profile.dsf_base_instance_iam_profile.id
+  iam_instance_profile          = var.iam_instance_profile_id
   vpc_security_group_ids        = [aws_security_group.public.id]
   tags = {
     Name = var.name
   }
   disable_api_termination = true
-}
-
-resource "aws_iam_instance_profile" "dsf_base_instance_iam_profile" {
-  name = "dsf_base_instance_iam_profile_${var.name}"
-  role = "${aws_iam_role.dsf_base_role.name}"
-}
-
-resource "aws_iam_role" "dsf_base_role" {
-  managed_policy_arns = ["arn:aws:iam::aws:policy/SecretsManagerReadWrite"]
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Sid    = ""
-        Principal = {
-          Service = "ec2.amazonaws.com"
-        }
-      },
-    ]
-  })
 }
 
 # Attach an additional storage device to DSF base instance

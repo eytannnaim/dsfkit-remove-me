@@ -37,6 +37,12 @@ variable sg_ingress_cidr {
   description = "List of allowed ingress cidr patterns for the DSF base instance"
 }
 
+variable iam_instance_profile_id {
+  type = string
+  default = null
+  description = "DSF base ec2 IAM instance profile id"
+}
+
 # This list was created with the following command
 # > for r in $(awsregions) ; do echo $r = $(aws --region $r ec2 describe-images  --filters Name=name,Values=RHEL-7.9_HVM-202205* | jq '.Images[0]."ImageId" '); done
 variable "dsf_base_amis_id" {

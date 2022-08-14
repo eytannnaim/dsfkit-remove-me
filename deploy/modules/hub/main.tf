@@ -72,6 +72,44 @@ data "template_file" "hub_cloudinit" {
   depends_on = [aws_secretsmanager_secret_version.dsf_hub_federation_public_key_ver, aws_secretsmanager_secret_version.dsf_hub_federation_private_key_ver]
 }
 
+resource "aws_iam_instance_profile" "dsf_hub_instance_iam_profile" {
+  name = "dsf_hub_instance_iam_profile_${var.name}"
+  role = "${aws_iam_role.dsf_hub_role.name}"
+}
+
+resource "aws_iam_role" "dsf_hub_role" {
+  name = "imperva_dsf_hub_role"
+  managed_policy_arns = null
+  inline_policy {
+    name = "imperva_dsf_hub_secret_access"
+    policy = jsonencode({
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": "secretsmanager:GetSecretValue",
+            "Resource": "arn:aws:secretsmanager:us-east-1:390467143220:secret:dsf_hub_federation_private_key_${var.name}"
+          }
+        ]
+      }
+    )
+  }
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Sid    = ""
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      },
+    ]
+  })
+}
+
 module "hub_instance" {
   source                = "../../modules/sonar_base_instance"
   region                = var.region
@@ -82,4 +120,5 @@ module "hub_instance" {
   ec2_instance_type     = var.instance_type
   ebs_state_disk_size   = var.disk_size
   sg_ingress_cidr       = var.sg_ingress_cidr
+  iam_instance_profile_id = aws_iam_instance_profile.dsf_hub_instance_iam_profile.id
 }
