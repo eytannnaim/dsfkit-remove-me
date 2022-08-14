@@ -45,7 +45,7 @@ module "hub" {
 }
 
 module "agentless_gw" {
-  count             = 2    
+  count             = 2
   source            = "../../modules/gw"
   name              = join("-", [local.deployment-name, local.salt])
   admin_password    = local.admin_password
