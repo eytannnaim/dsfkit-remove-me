@@ -112,7 +112,6 @@ resource "aws_iam_role" "dsf_hub_role" {
 
 module "hub_instance" {
   source                = "../../modules/sonar_base_instance"
-  region                = var.region
   name                  = join("-", [var.name, "hub"])
   subnet_id             = var.subnet_id
   ec2_user_data         = data.template_file.hub_cloudinit.rendered

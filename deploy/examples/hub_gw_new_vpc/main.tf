@@ -39,17 +39,15 @@ module "vpc" {
 module "hub" {
   source            = "../../modules/hub"
   name              = join("-", [local.deployment-name, local.salt])
-  region            = local.region
   subnet_id         = module.vpc.public_subnets[0]
   admin_password    = local.admin_password
   sg_ingress_cidr   = [join("/", [data.http.workstartion_public_ip.body, "32"])]
 }
 
 module "agentless_gw" {
-  for_each          = toset( [ "1", "2", "3" ] )
+  for_each          = toset( [ "1" ] )
   source            = "../../modules/gw"
   name              = join("-", [local.deployment-name, local.salt, each.value])
-  region            = local.region
   admin_password    = local.admin_password
   subnet_id         = module.vpc.public_subnets[0]
   hub_ip            = module.hub.public_eip

@@ -9,8 +9,10 @@ resource "aws_eip" "dsf_instance_eip" {
   vpc      = true
 }
 
+data "aws_region" "current" {}
+
 resource "aws_instance" "dsf_base_instance" {
-  ami                           = var.dsf_base_amis_id[var.region]
+  ami                           = var.dsf_base_amis_id[data.aws_region.current.name]
   instance_type                 = var.ec2_instance_type
   key_name                      = var.key_pair
   subnet_id                     = var.subnet_id
