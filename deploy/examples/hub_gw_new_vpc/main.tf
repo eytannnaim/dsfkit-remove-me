@@ -45,9 +45,9 @@ module "hub" {
 }
 
 module "agentless_gw" {
-  for_each          = toset( [ "1" ] )
+  count             = 2    
   source            = "../../modules/gw"
-  name              = join("-", [local.deployment-name, local.salt, each.value])
+  name              = join("-", [local.deployment-name, local.salt])
   admin_password    = local.admin_password
   subnet_id         = module.vpc.public_subnets[0]
   hub_ip            = module.hub.public_eip
