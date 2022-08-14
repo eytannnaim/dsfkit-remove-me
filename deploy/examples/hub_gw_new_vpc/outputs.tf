@@ -7,7 +7,9 @@ output "dsf_hub_eip" {
 }
 
 output "dsf_gw_eip" {
-    value = module.agentless_gw.public_eip
+  value = [
+    for gw in module.agentless_gw : gw.public_eip
+  ]
 }
 
 output "hub_web_console_url" {

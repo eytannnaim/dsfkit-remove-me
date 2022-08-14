@@ -89,7 +89,7 @@ resource "aws_iam_role" "dsf_hub_role" {
             "Sid": "VisualEditor0",
             "Effect": "Allow",
             "Action": "secretsmanager:GetSecretValue",
-            "Resource": "arn:aws:secretsmanager:us-east-1:390467143220:secret:dsf_hub_federation_private_key_${var.name}"
+            "Resource": "${aws_secretsmanager_secret.dsf_hub_federation_public_key.arn}"
           }
         ]
       }
