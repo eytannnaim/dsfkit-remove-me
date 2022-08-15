@@ -1,24 +1,3 @@
-##############################
-# Generating ssh key pair
-##############################
-
-resource "aws_key_pair" "hub_ssh_keypair" {
-  key_name      = "dsf_hub_ssh_keypair_${var.name}"
-  public_key    =  data.local_file.dsf_hub_ssh_key.content
-}
-
-resource "null_resource" "dsf_hub_ssh_key_pair_creator" {
-  provisioner "local-exec" {
-    command     = "[ -f 'dsf_hub_ssh_key' ] || ssh-keygen -t rsa -f 'dsf_hub_ssh_key' -P '' -q && chmod 400 dsf_hub_ssh_key"
-    interpreter = ["/bin/bash", "-c"]
-  }
-}
-
-data "local_file" "dsf_hub_ssh_key" {
-  filename      = "dsf_hub_ssh_key.pub"
-  depends_on    = [null_resource.dsf_hub_ssh_key_pair_creator]
-}
-
 #################################
 # Generating ssh federation keys
 #################################
@@ -118,7 +97,7 @@ module "hub_instance" {
   name                  = join("-", [var.name, "hub"])
   subnet_id             = var.subnet_id
   ec2_user_data         = data.template_file.hub_cloudinit.rendered
-  key_pair              = aws_key_pair.hub_ssh_keypair.key_name
+  key_pair              = var.key_pair
   ec2_instance_type     = var.instance_type
   ebs_state_disk_size   = var.disk_size
   sg_ingress_cidr       = var.sg_ingress_cidr

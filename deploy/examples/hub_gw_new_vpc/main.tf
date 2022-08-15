@@ -45,7 +45,7 @@ module "hub" {
 }
 
 module "agentless_gw" {
-  count             = 2    
+  count             = 1
   source            = "../../modules/gw"
   name              = join("-", [local.deployment-name, local.salt])
   admin_password    = local.admin_password
@@ -53,5 +53,5 @@ module "agentless_gw" {
   hub_ip            = module.hub.public_eip
   key_pair          = module.hub.hub_key_pair
   federation_public_key = module.hub.federation_public_key
-  sg_ingress_cidr   = concat([join("/", [data.http.workstartion_public_ip.body, "32"])], [join("/", [module.hub.public_eip, "32"])])
+  sg_ingress_cidr   = concat(["${data.http.workstartion_public_ip.body}/32"], ["${module.hub.public_eip}/32"])
 }
