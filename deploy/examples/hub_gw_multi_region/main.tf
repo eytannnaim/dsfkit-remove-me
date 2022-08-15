@@ -105,5 +105,5 @@ module "agentless_gw" {
   hub_ip            = module.hub.public_eip
   key_pair          = aws_key_pair.hub_ssh_keypair_europe.key_name
   federation_public_key = module.hub.federation_public_key
-  sg_ingress_cidr   = concat([join("/", [data.http.workstartion_public_ip.body, "32"])], [join("/", [module.hub.public_eip, "32"])])
+  sg_ingress_cidr   = concat(["${data.http.workstartion_public_ip.body}/32"], ["${module.hub.public_eip}/32"])
 }
