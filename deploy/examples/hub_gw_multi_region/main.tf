@@ -1,18 +1,5 @@
-locals {
-  main_region = "us-east-1"
-  sec_region = "eu-west-2"
-  deployment-name = "imperva-dsf"
-  admin_password = "Imp3rva12#"
-  salt = substr(module.vpc.vpc_id, -8, -1)
-}
-
 provider "aws" {
   region = local.main_region
-}
-
-provider "aws" {
-  region = local.sec_region
-  alias  = "eu-west-2"
 }
 
 provider "aws" {
@@ -20,6 +7,13 @@ provider "aws" {
   alias  = "europe"
 }
 
+locals {
+  main_region = "us-east-1"
+  sec_region = "eu-west-2"
+  deployment-name = "imperva-dsf"
+  admin_password = "Imp3rva12#"
+  salt = substr(module.vpc.vpc_id, -8, -1)
+}
 
 data "http" "workstartion_public_ip" {
   url = "https://ifconfig.me"
