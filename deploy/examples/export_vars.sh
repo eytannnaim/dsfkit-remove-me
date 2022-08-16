@@ -1,3 +1,0 @@
-export TF_VAR_aws_region=eu-west-2
-export TF_VAR_aws_access_key=AKIAVV2NHYY2IHQ4QXNK
-export TF_VAR_aws_secret_key=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
