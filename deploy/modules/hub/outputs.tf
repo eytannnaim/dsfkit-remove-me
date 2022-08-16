@@ -3,5 +3,5 @@ output "public_eip" {
 }
 
 output "federation_public_key" {
-  value = data.local_file.dsf_hub_public_ssh_federation_key.content
+  value = resource.tls_private_key.dsf_hub_ssh_federation_key.public_key_openssh
 }

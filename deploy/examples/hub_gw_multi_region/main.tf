@@ -73,7 +73,7 @@ module "vpc2" {
   source = "terraform-aws-modules/vpc/aws"
 
   providers         = {
-    aws = aws.eu-west-2
+    aws = aws.europe
   }
 
   name = local.deployment-name
@@ -90,7 +90,7 @@ module "vpc2" {
 module "agentless_gw" {
   count             = 1
   providers         = {
-    aws = aws.eu-west-2
+    aws = aws.europe
   }
   source            = "../../modules/gw"
   name              = join("-", [local.deployment-name, local.salt])

@@ -1,21 +1,10 @@
 #################################
 # Generating ssh federation keys
 #################################
-resource "null_resource" "dsf_hub_ssh_federation_key_pair_creator" {
-  provisioner "local-exec" {
-    command     = "rm -f dsf_hub_federation_ssh_key{,.pub} && ssh-keygen -b 4096 -t rsa -m PEM -f 'dsf_hub_federation_ssh_key' -P '' -q && chmod 400 dsf_hub_federation_ssh_key"
-    interpreter = ["/bin/bash", "-c"]
-  }
-}
 
-data "local_file" "dsf_hub_public_ssh_federation_key" {
-  filename      = "dsf_hub_federation_ssh_key.pub"
-  depends_on    = [null_resource.dsf_hub_ssh_federation_key_pair_creator]
-}
-
-data "local_sensitive_file" "dsf_hub_private_ssh_federation_key" {
-  filename      = "dsf_hub_federation_ssh_key"
-  depends_on    = [null_resource.dsf_hub_ssh_federation_key_pair_creator]
+resource "tls_private_key" "dsf_hub_ssh_federation_key" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
 }
 
 resource "aws_secretsmanager_secret" "dsf_hub_federation_public_key" {
@@ -25,7 +14,7 @@ resource "aws_secretsmanager_secret" "dsf_hub_federation_public_key" {
 
 resource "aws_secretsmanager_secret_version" "dsf_hub_federation_public_key_ver" {
   secret_id     = aws_secretsmanager_secret.dsf_hub_federation_public_key.id
-  secret_string = data.local_file.dsf_hub_public_ssh_federation_key.content
+  secret_string = resource.tls_private_key.dsf_hub_ssh_federation_key.public_key_openssh
 }
 
 resource "aws_secretsmanager_secret" "dsf_hub_federation_private_key" {
@@ -35,8 +24,12 @@ resource "aws_secretsmanager_secret" "dsf_hub_federation_private_key" {
 
 resource "aws_secretsmanager_secret_version" "dsf_hub_federation_private_key_ver" {
   secret_id     = aws_secretsmanager_secret.dsf_hub_federation_private_key.id
-  secret_string = data.local_sensitive_file.dsf_hub_private_ssh_federation_key.content
+  secret_string = resource.tls_private_key.dsf_hub_ssh_federation_key.private_key_pem
 }
+
+#################################
+# Hub cloudinit script (AKA userdata)
+#################################
 
 data "template_file" "hub_cloudinit" {
   template = file("${path.module}/hub_cloudinit.tpl")
@@ -50,6 +43,11 @@ data "template_file" "hub_cloudinit" {
   }
   depends_on = [aws_secretsmanager_secret_version.dsf_hub_federation_public_key_ver, aws_secretsmanager_secret_version.dsf_hub_federation_private_key_ver]
 }
+
+
+#################################
+# Hub IAM role to read from aws secrets manager
+#################################
 
 resource "aws_iam_instance_profile" "dsf_hub_instance_iam_profile" {
   name = "dsf_hub_instance_iam_profile_${var.name}"
@@ -91,6 +89,11 @@ resource "aws_iam_role" "dsf_hub_role" {
     ]
   })
 }
+
+
+#################################
+# Actual Hub instance
+#################################
 
 module "hub_instance" {
   source                = "../../modules/sonar_base_instance"
