@@ -1,0 +1,55 @@
+---
+#- name: Retrieve host vars
+#  hosts:
+#    - gw
+##    - hub
+#  gather_facts: no
+#  tasks:
+#    - debug:
+#        var=hostvars['hub']['ansible_ssh_host']
+- name: wait for setup to complete
+  hosts: gw hub
+  gather_facts: no
+  tasks:
+    - name: wait for success in setup log
+      wait_for:
+        timeout: 600
+        sleep: 10
+        search_regex: "Initial configuration completed"
+        path: /opt/sonar-dsf/jsonar/state/logs/sonar-setup-log
+    - name: wait for port 8443
+      wait_for:
+        timeout: 600
+        sleep: 10
+        host: 127.0.0.1
+        port: 8443
+- name: Federation
+  hosts: gw
+  gather_facts: no
+  tasks:
+    - name: hub federation
+      shell: |
+        source /etc/sysconfig/jsonar
+        if ! grep Remote_{{ hostvars['gw']['ansible_ssh_host'] }} /data_vol/sonar-dsf/jsonar/local/dispatcher/dispatcher.conf &> /dev/null; then
+            ${JSONAR_BASEDIR}/bin/federated warehouse {{ hostvars['hub']['ansible_ssh_host'] }} {{ hostvars['gw']['ansible_ssh_host'] }}
+        fi
+      args:
+        executable: /bin/bash
+      become: true
+      delegate_to: hub
+      register: warehouse_output
+    - debug:
+        var=warehouse_output.stdout_lines
+    - name: gw federation
+      shell: |
+        source /etc/sysconfig/jsonar
+        if ! grep 'Remote setup completed' /data_vol/sonar-dsf/jsonar/logs/sonarg/federated.log &> /dev/null; then
+            ${JSONAR_BASEDIR}/bin/federated warehouse {{ hostvars['hub']['ansible_ssh_host'] }} {{ hostvars['gw']['ansible_ssh_host'] }}
+        fi
+        ${JSONAR_BASEDIR}/bin/federated remote
+      args:
+        executable: /bin/bash
+      become: true
+      register: gw_output
+    - debug:
+        var=gw_output.stdout_lines
