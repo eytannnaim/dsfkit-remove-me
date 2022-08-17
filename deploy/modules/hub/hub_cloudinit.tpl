@@ -15,7 +15,7 @@ for d in $DEVICES; do
 done
 
 ## Formatting the device
-STATE_DIR=/opt/sonar-dsf/jsonar/state
+STATE_DIR=/data_vol/sonar-dsf/jsonar
 mkdir -p $STATE_DIR/logs $STATE_DIR/local $STATE_DIR/data
 mkfs -t xfs /dev/$DEVICE
 

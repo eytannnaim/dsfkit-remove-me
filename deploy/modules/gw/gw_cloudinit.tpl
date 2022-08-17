@@ -2,7 +2,7 @@
 exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
 cd /root
 yum update -y
-STATE_DIR=/opt/sonar-dsf/jsonar/state
+STATE_DIR=/data_vol/sonar-dsf/jsonar
 mkdir -p $STATE_DIR/logs $STATE_DIR/local $STATE_DIR/data
 
 /opt/sonar-dsf/jsonar/apps/*/bin/sonarg-setup --no-interactive \
