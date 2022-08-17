@@ -17,6 +17,7 @@ data "template_file" "gw_cloudinit" {
     secadmin_password   = var.admin_password
     sonarg_pasword      = var.admin_password
     sonargd_pasword     = var.admin_password
+    display-name        = "DSF-gw-${var.name}"
     federation_public_key = var.federation_public_key
   }
 }

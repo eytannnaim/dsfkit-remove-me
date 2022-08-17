@@ -26,7 +26,7 @@ mount -a
 # Installing sonar sw as a hub
 /opt/sonar-dsf/jsonar/apps/*/bin/sonarg-setup --no-interactive \
     --accept-eula \
-    --jsonar-uid-display-name "DSF-Hub" \
+    --jsonar-uid-display-name "${display-name}" \
     --jsonar-uid $(uuidgen) \
     --not-remote-machine \
     --product sonar-platform \

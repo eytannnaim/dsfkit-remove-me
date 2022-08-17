@@ -38,6 +38,7 @@ data "template_file" "hub_cloudinit" {
     secadmin_password   = var.admin_password
     sonarg_pasword      = var.admin_password
     sonargd_pasword     = var.admin_password
+    display-name        = "DSF-hub-${var.name}"
     dsf_hub_sonarw_private_ssh_key_name="dsf_hub_federation_private_key_${var.name}"
     dsf_hub_sonarw_public_ssh_key_name="dsf_hub_federation_public_key_${var.name}"
   }
@@ -55,7 +56,7 @@ resource "aws_iam_instance_profile" "dsf_hub_instance_iam_profile" {
 }
 
 resource "aws_iam_role" "dsf_hub_role" {
-  name = "imperva_dsf_hub_role"
+  name = "imperva_dsf_hub_role_${var.name}"
   managed_policy_arns = null
   inline_policy {
     name = "imperva_dsf_hub_secret_access"

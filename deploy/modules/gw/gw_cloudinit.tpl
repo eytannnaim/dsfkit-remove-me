@@ -2,10 +2,12 @@
 exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
 cd /root
 yum update -y
-STATE_DIR=/opt/sonar-dsf/jsonar
+STATE_DIR=/opt/sonar-dsf/jsonar/state
+mkdir -p $STATE_DIR/logs $STATE_DIR/local $STATE_DIR/data
+
 /opt/sonar-dsf/jsonar/apps/*/bin/sonarg-setup --no-interactive \
     --accept-eula \
-    --jsonar-uid-display-name "DSF-Hub" \
+    --jsonar-uid-display-name "${display-name}" \
     --jsonar-uid $(uuidgen) \
     --remote-machine \
     --product sonar-platform \
