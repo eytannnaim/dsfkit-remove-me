@@ -25,22 +25,21 @@ data "http" "workstartion_public_ip" {
 # Generating ssh key pair
 ##############################
 
-resource "null_resource" "dsf_hub_ssh_key_pair_creator" {
-  provisioner "local-exec" {
-    command     = "[ -f 'dsf_hub_ssh_key' ] || ssh-keygen -t rsa -f 'dsf_hub_ssh_key' -P '' -q && chmod 400 dsf_hub_ssh_key"
-    interpreter = ["/bin/bash", "-c"]
-  }
+module "key_pair" {
+  source = "terraform-aws-modules/key-pair/aws"
+  key_name           = "dsf_hub_ssh_key"
+  create_private_key = true
 }
 
-data "local_file" "dsf_hub_ssh_key" {
-  filename      = "dsf_hub_ssh_key.pub"
-  depends_on    = [null_resource.dsf_hub_ssh_key_pair_creator]
+resource "local_file" "dsf_hub_ssh_key_file" {
+  sensitive_content = module.key_pair.private_key_pem
+  file_permission = 400
+  filename = "dsf_hub_ssh_key"
 }
 
-resource "aws_key_pair" "hub_ssh_keypair" {
-  key_name      = "dsf_hub_ssh_keypair"
-  public_key    =  data.local_file.dsf_hub_ssh_key.content
-}
+##############################
+# Generating network
+##############################
 
 module "vpc" {
   source = "terraform-aws-modules/vpc/aws"
@@ -56,11 +55,15 @@ module "vpc" {
   single_nat_gateway = true
 }
 
+##############################
+# Generating deployment
+##############################
+
 module "hub" {
   source            = "../../modules/hub"
   name              = join("-", [local.deployment-name, local.salt])
   subnet_id         = module.vpc.public_subnets[0]
-  key_pair          = aws_key_pair.hub_ssh_keypair.key_name
+  key_pair          = module.key_pair.key_pair_name
   admin_password    = local.admin_password
   sg_ingress_cidr   = [join("/", [data.http.workstartion_public_ip.body, "32"])]
 }
@@ -72,7 +75,7 @@ module "agentless_gw" {
   admin_password    = local.admin_password
   subnet_id         = module.vpc.public_subnets[0]
   hub_ip            = module.hub.public_address
-  key_pair          = aws_key_pair.hub_ssh_keypair.key_name
+  key_pair          = module.key_pair.key_pair_name
   federation_public_key = module.hub.federation_public_key
   sg_ingress_cidr   = concat(["${data.http.workstartion_public_ip.body}/32"], ["${module.hub.public_address}/32"])
 }
