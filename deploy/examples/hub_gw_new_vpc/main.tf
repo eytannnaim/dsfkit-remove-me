@@ -31,8 +31,8 @@ module "key_pair" {
   create_private_key = true
 }
 
-resource "local_file" "dsf_hub_ssh_key_file" {
-  sensitive_content = module.key_pair.private_key_pem
+resource "local_sensitive_file" "dsf_hub_ssh_key_file" {
+  content = module.key_pair.private_key_pem
   file_permission = 400
   filename = "dsf_hub_ssh_key"
 }
