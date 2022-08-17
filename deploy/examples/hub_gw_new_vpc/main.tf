@@ -71,8 +71,8 @@ module "agentless_gw" {
   name              = join("-", [local.deployment-name, local.salt])
   admin_password    = local.admin_password
   subnet_id         = module.vpc.public_subnets[0]
-  hub_ip            = module.hub.public_eip
+  hub_ip            = module.hub.public_address
   key_pair          = aws_key_pair.hub_ssh_keypair.key_name
   federation_public_key = module.hub.federation_public_key
-  sg_ingress_cidr   = concat(["${data.http.workstartion_public_ip.body}/32"], ["${module.hub.public_eip}/32"])
+  sg_ingress_cidr   = concat(["${data.http.workstartion_public_ip.body}/32"], ["${module.hub.public_address}/32"])
 }

@@ -1,5 +1,9 @@
-output "public_eip" {
-  value = module.hub_instance.instance_eip
+output "public_address" {
+  value = module.hub_instance.public_address
+}
+
+output "private_address" {
+  value = module.hub_instance.private_address
 }
 
 output "federation_public_key" {

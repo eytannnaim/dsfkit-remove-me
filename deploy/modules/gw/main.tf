@@ -4,7 +4,7 @@ resource "null_resource" "federate_exec" {
     interpreter     = ["/bin/bash", "-c"]
     environment = {
       HUB_IP = var.hub_ip
-      GW_IP  = module.gw_instance.instance_eip
+      GW_IP  = module.gw_instance.public_address
     }
   }
   depends_on = [module.gw_instance]
