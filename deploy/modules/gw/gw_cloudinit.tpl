@@ -10,7 +10,7 @@ mkdir -p $STATE_DIR/logs $STATE_DIR/local $STATE_DIR/data
     --jsonar-uid-display-name "${display-name}" \
     --jsonar-uid $(uuidgen) \
     --remote-machine \
-    --product sonar-platform \
+    --product imperva-data-security \
     --newadmin-pass=${admin_password} \
     --secadmin-pass=${secadmin_password} \
     --sonarg-pass=${sonarg_pasword} \

@@ -29,7 +29,7 @@ mount -a
     --jsonar-uid-display-name "${display-name}" \
     --jsonar-uid $(uuidgen) \
     --not-remote-machine \
-    --product sonar-platform \
+    --product imperva-data-security \
     --newadmin-pass=${admin_password} \
     --secadmin-pass=${secadmin_password} \
     --sonarg-pass=${sonarg_pasword} \
