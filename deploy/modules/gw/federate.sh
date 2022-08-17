@@ -25,4 +25,4 @@ sudo /opt/sonar-dsf/jsonar/apps/*/bin/federated warehouse '${dsf_hub_ip}' '${dsf
 rm sync_file
 HERE
 
-ssh -o StrictHostKeyChecking="no" -o ProxyCommand="ssh -i dsf_hub_ssh_key -W %h:%p ec2-user@${dsf_hub_ip}" -i dsf_hub_ssh_key ec2-user@${dsf_gw_ip}
+ssh -o StrictHostKeyChecking="no" -o ProxyCommand="ssh -i dsf_hub_ssh_key -W %h:%p ec2-user@${dsf_hub_ip}" -i dsf_hub_ssh_key ec2-user@${dsf_gw_ip} -C 'sudo /opt/sonar-dsf/jsonar/apps/*/bin/federated remote'
