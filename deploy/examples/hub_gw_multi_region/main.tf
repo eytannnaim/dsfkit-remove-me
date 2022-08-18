@@ -16,7 +16,7 @@ locals {
 }
 
 data "http" "workstartion_public_ip" {
-  url = "https://ifconfig.me"
+  url = "http://ipv4.icanhazip.com"
 }
 
 ##############################
@@ -32,7 +32,7 @@ module "key_pair" {
 resource "local_sensitive_file" "dsf_hub_ssh_key_file" {
   content = module.key_pair.private_key_pem
   file_permission = 400
-  filename = "dsf_hub_ssh_key"
+  filename = "ssh_keys/dsf_hub_ssh_key"
 }
 
 resource "aws_key_pair" "hub_ssh_keypair_europe" {
@@ -87,7 +87,8 @@ module "hub" {
   subnet_id         = module.vpc.public_subnets[0]
   key_pair          = module.key_pair.key_pair_name
   admin_password    = local.admin_password
-  sg_ingress_cidr   = [join("/", [data.http.workstartion_public_ip.body, "32"])]
+  sg_ingress_cidr   = [join("/", [chomp(data.http.workstartion_public_ip.body), "32"])]
+  disk_size         = 650
 }
 
 module "agentless_gw" {
@@ -102,5 +103,5 @@ module "agentless_gw" {
   hub_ip            = module.hub.public_address
   key_pair          = module.key_pair.key_pair_name
   federation_public_key = module.hub.federation_public_key
-  sg_ingress_cidr   = concat(["${data.http.workstartion_public_ip.body}/32"], ["${module.hub.public_address}/32"])
+  sg_ingress_cidr   = concat(["${chomp(data.http.workstartion_public_ip.body)}/32"], ["${module.hub.public_address}/32"])
 }
