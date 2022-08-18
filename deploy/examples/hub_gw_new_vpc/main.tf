@@ -78,5 +78,5 @@ module "agentless_gw" {
   key_pair          = module.key_pair.key_pair_name
   federation_public_key = module.hub.federation_public_key
   sg_ingress_cidr   = ["${chomp(data.http.workstartion_public_ip.body)}/32", "${module.hub.public_address}/32"]
-  sg_ingress_hub    = [module.hub.sg_id]
+  sg_ingress_hub    = module.hub.sg_id
 }

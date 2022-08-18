@@ -105,5 +105,6 @@ module "hub_instance" {
   ec2_instance_type     = var.instance_type
   ebs_state_disk_size   = var.disk_size
   sg_ingress_cidr       = var.sg_ingress_cidr
+  sg_ingress_sg         = module.hub_instance.sg_id
   iam_instance_profile_id = aws_iam_instance_profile.dsf_hub_instance_iam_profile.id
 }

@@ -34,8 +34,8 @@ variable sg_ingress_cidr {
 }
 
 variable sg_ingress_sg {
-  type = list
-  default = []
+  type = string
+  default = null
   description = "List of allowed ingress sg ids for the DSF hub instance"
 }
 
