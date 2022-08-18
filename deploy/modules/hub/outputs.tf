@@ -9,3 +9,7 @@ output "private_address" {
 output "federation_public_key" {
   value = resource.tls_private_key.dsf_hub_ssh_federation_key.public_key_openssh
 }
+
+output "sg_id" {
+  value = module.hub_instance.sg_id
+}

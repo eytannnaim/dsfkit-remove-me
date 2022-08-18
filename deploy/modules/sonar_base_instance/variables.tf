@@ -33,6 +33,12 @@ variable sg_ingress_cidr {
   description = "List of allowed ingress cidr patterns for the DSF base instance"
 }
 
+variable sg_ingress_sg {
+  type = list
+  default = []
+  description = "List of allowed ingress sg ids for the DSF hub instance"
+}
+
 variable iam_instance_profile_id {
   type = string
   default = null

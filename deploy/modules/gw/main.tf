@@ -1,3 +1,4 @@
+# We should probably transform this local-exec to an Ansible playbook and run it from the main deployment script
 resource "null_resource" "federate_exec" {
   provisioner "local-exec" {
     command         = "${path.module}/federate.sh $HUB_IP $GW_IP"
@@ -31,4 +32,5 @@ module "gw_instance" {
   ec2_instance_type     = var.instance_type
   ebs_state_disk_size   = var.disk_size
   sg_ingress_cidr       = var.sg_ingress_cidr
+  sg_ingress_sg         = var.sg_ingress_hub
 }
