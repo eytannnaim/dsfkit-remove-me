@@ -10,3 +10,4 @@ dsf_hub_ssh_key.pub
 *backend.tf
 *gitignore*
 *.terraform*
+*.DS_Store
