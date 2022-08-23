@@ -9,3 +9,4 @@ dsf_hub_ssh_key.pub
 *terraform.tfvars
 *backend.tf
 *gitignore*
+.terraform*
