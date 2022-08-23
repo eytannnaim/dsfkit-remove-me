@@ -6,9 +6,9 @@ provider "aws" {
   region = var.region
 }
 
-resource "aws_secretsmanager_secret" "sonar_secrets" {
-  name = "${var.environment}/sonar"
-}
+#################################
+# Generating system passwords
+#################################
 
 # /* Populate AWS secrets */
 # resource "random_password" "admin_password" {
@@ -49,7 +49,7 @@ resource "aws_secretsmanager_secret" "sonar_secrets" {
 
 locals {
   uniqueName = uuid()
-  sonar_obj  = {
+  dsf_passwords_obj  = {
     admin_password = "Imperva123#"
     secadmin_password = "Imperva123#"
     sonarg_pasword = "Imperva123#"
@@ -57,72 +57,105 @@ locals {
   }
 }
 
-resource "aws_secretsmanager_secret_version" "ses" {
-  secret_id     = aws_secretsmanager_secret.sonar_secrets.id
-  secret_string = jsonencode(local.sonar_obj)
+resource "aws_secretsmanager_secret" "dsf_passwords" {
+  name = "${var.environment}/dsf_passwords"
 }
 
-data "aws_instance" "sonar-snow-dev" {
-  filter {
-    name   = "tag:Name"
-    values = ["sonar-snow-dev"]
-  }
+resource "aws_secretsmanager_secret_version" "dsf_passwords" {
+  secret_id     = aws_secretsmanager_secret.dsf_passwords.id
+  secret_string = jsonencode(local.dsf_passwords_obj)
 }
 
-resource "aws_iam_policy" "sonar_role_policy" {
-  name = "sonar_role_policy_${local.uniqueName}"
-  description = "A policy to allow secret decryption"
-  policy = <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
+#################################
+# Generating ssh federation keys
+#################################
+
+resource "tls_private_key" "dsf_hub_ssh_federation_key" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+resource "aws_secretsmanager_secret" "dsf_hub_federation_public_key" {
+  name          = "${var.environment}/dsf_hub_federation_public_key"
+  description   = "Imperva DSF Hub sonarw public ssh key - used for remote gw federation"
+}
+
+resource "aws_secretsmanager_secret_version" "dsf_hub_federation_public_key_ver" {
+  secret_id     = aws_secretsmanager_secret.dsf_hub_federation_public_key.id
+  secret_string = resource.tls_private_key.dsf_hub_ssh_federation_key.public_key_openssh
+}
+
+resource "aws_secretsmanager_secret" "dsf_hub_federation_private_key" {
+  name          = "${var.environment}/dsf_hub_federation_private_key"
+  description   = "Imperva DSF Hub sonarw private ssh key - used for remote gw federation"
+}
+
+resource "aws_secretsmanager_secret_version" "dsf_hub_federation_private_key_ver" {
+  secret_id     = aws_secretsmanager_secret.dsf_hub_federation_private_key.id
+  secret_string = resource.tls_private_key.dsf_hub_ssh_federation_key.private_key_pem
+}
+
+###############################################
+# Hub IAM role to read from aws secrets manager
+###############################################
+
+resource "aws_iam_instance_profile" "dsf_instance_iam_profile" {
+  name = "${var.environment}_dsf_instance_iam_profile"
+  role = "${aws_iam_role.dsf_role.name}"
+}
+
+resource "aws_iam_role" "dsf_role" {
+  name = "${var.environment}_imperva_dsf_role"
+  managed_policy_arns = null
+  inline_policy {
+    name = "imperva_dsf_access"
+    policy = jsonencode({
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": "secretsmanager:GetSecretValue",
+            "Resource": [
+              "${aws_secretsmanager_secret.dsf_hub_federation_public_key.arn}",
+              "${aws_secretsmanager_secret.dsf_hub_federation_private_key.arn}"
+            ]
+          },
+          {
             "Effect": "Allow",
             "Action": [
-                "secretsmanager:GetResourcePolicy",
-                "secretsmanager:GetSecretValue",
-                "secretsmanager:DescribeSecret",
-                "secretsmanager:ListSecretVersionIds"
+                "s3:ListBucket",
+                "s3:ListAllMyBuckets"
             ],
-            "Resource": ["${data.aws_instance.sonar-snow-dev.arn}"]
-        },
-        {
+            "Resource": "arn:aws:s3:::*"
+          },
+          {
             "Effect": "Allow",
-            "Action": "secretsmanager:ListSecrets",
-            "Resource": "*"
+            "Action": [
+                "s3:ListBucket",
+                "s3:GetObject"
+            ],
+            "Resource": [
+                "arn:aws:s3:::${var.s3_bucket}",
+                "arn:aws:s3:::${var.s3_bucket}/*"
+            ],
+            "Condition": {}
+          }
+        ]
+      }
+    )
+  }
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Sid    = ""
+        Principal = {
+          Service = "ec2.amazonaws.com"
         }
+      }
     ]
-}
-EOF
-}
-
-resource "aws_iam_policy_attachment" "role_attach_sonar_role_policy" {
-  name = "role_attach_sonar_role_policy_ ${local.uniqueName}"
-  roles = [aws_iam_role.SonarRootRole.name]
-  policy_arn = aws_iam_policy.sonar_role_policy.arn
-}
-
-resource "aws_iam_role" "SonarRootRole" {
-  name = "SonarRootRole${local.uniqueName}"
-  path = "/"
-  assume_role_policy = <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Sid": "",
-            "Effect": "Allow",
-            "Action": "sts:AssumeRole",
-            "Principal": {
-              "Service":"ec2.amazonaws.com"
-            }
-        }
-     ]
-}
-EOF
-}
-
-resource "aws_iam_instance_profile" "SonarRootInstanceProfile" {
-  name = "SonarRootInstanceProfile_${local.uniqueName}"
-  role = aws_iam_role.SonarRootRole.name
+  })
 }
