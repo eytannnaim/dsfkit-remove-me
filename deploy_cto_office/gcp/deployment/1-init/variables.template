@@ -1,0 +1,44 @@
+variable "environment" {
+  type = string
+  default = "dev"
+  description = "Environment name"
+  validation {
+    condition = length(var.environment) > 3
+    error_message = "Deployment name must be at least 3 characters"
+  }
+}
+
+variable "service_account_name" {
+  type = string
+  description = "GCP service account name."
+}
+
+variable "service_account_id" {
+  type = string
+  description = "GCP service account ID."
+}
+
+variable "region" {
+  type = string
+  description = "Region to deploy dsf in."
+}
+
+variable "project_id" {
+  type = string
+  description = "ID of the project in GCP." # octo
+}
+
+variable "zone" {
+  type = string
+  description = "Region to deploy dsf in."
+}
+
+variable "key_pair_pem_local_path" {
+  type = string
+  description = "Path to local key pair used to access dsf instances via ssh to run remote commands."
+}
+
+variable "gcp_bucket_name" {
+  type = string
+  description = "Name of the storage bucket."
+}
