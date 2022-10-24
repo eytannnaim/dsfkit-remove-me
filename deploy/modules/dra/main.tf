@@ -46,9 +46,10 @@ output "admin_server_url" {
 }
 
 # Check for Sonar variables:
-#   1. Configure scp job to receieve audit data
-#              
-#   2. Configure listener on gateway for DRA to send events to 
+#   1. Configuring Sonar to Send Audit to DRA
+#        https://docs.imperva.com/bundle/v4.3-data-risk-analytics-installation-guide/page/76935.htm      
+#   2. Configure Sonar port on gateway for DRA to send events to via syslog
+#        https://docs.imperva.com/bundle/v4.6-sonar-user-guide/page/81258.htm 
 
 
 # resource "aws_instance" "jump_server" {
